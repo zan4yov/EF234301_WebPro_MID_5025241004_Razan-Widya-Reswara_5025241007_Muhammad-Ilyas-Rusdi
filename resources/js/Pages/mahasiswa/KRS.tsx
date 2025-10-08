@@ -1,0 +1,367 @@
+import { Head, useForm, router } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Alert, AlertDescription} from '@/components/ui/alert';
+import { Plus, Trash2, Send, CheckCircle2, Info, Clock, XCircle, AlertCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PageProps, Krs, Kelas, TahunAkademik, Mahasiswa } from '@/types';
+import { toast } from 'sonner';
+
+interface KrsPageProps extends PageProps {
+  mahasiswa: Mahasiswa;
+  currentKrs: Krs | null;
+  availableClasses: Kelas[];
+  activePeriod: TahunAkademik | null;
+}
+
+export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, activePeriod }: KrsPageProps) {
+  const { data, setData, post, processing } = useForm({
+    kelas_ids: currentKrs?.detail_krs?.map(detail => detail.kelas_id_kelas) || [],
+  });
+
+  // Control which tab is visible; switch back to 'current' after successful submit.
+  const [activeTab, setActiveTab] = useState<'current' | 'add'>(currentKrs ? 'current' : 'add');
+
+  const selectedKelas = data.kelas_ids as string[];
+
+  const getStatusBadge = (status: number) => {
+    if (status === 0) {
+      return (
+        <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+          Menunggu Persetujuan
+        </Badge>
+      );
+    } else if (status === 1) {
+      return (
+        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+          Disetujui
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+          Ditolak
+        </Badge>
+      );
+    }
+  };
+
+  const getTotalSKS = () => selectedKelas.reduce((total, kelasId) => {
+    const kelas = availableClasses.find(k => k.id_kelas === kelasId);
+    return total + (kelas?.matakuliah?.sks || 0);
+  }, 0);
+
+  const getJenisMK = (jenis?: number) => {
+    if (jenis === 1) return 'Wajib';
+    if (jenis === 2) return 'Pilihan';
+    return 'Lainnya';
+  };
+
+  const isKelasAvailable = (kelas: Kelas) => {
+    if (!kelas.kapasitas) return true;
+    return (kelas.terisi || 0) < kelas.kapasitas;
+  };
+
+  const availableKelas = useMemo(() => {
+    return availableClasses.filter(k => {
+      if (!k.matakuliah) return false;
+      const required = k.matakuliah.minimal_semester as number | undefined;
+      return required == null || mahasiswa.semester >= required;
+    });
+  }, [availableClasses, mahasiswa.semester]);
+
+  const selectedCourseCodes = useMemo(() => {
+    const codes = new Set<string>();
+    selectedKelas.forEach(id => {
+      const kelas = availableClasses.find(k => k.id_kelas === id);
+      if (kelas?.matakuliah?.kode_mk) codes.add(kelas.matakuliah.kode_mk);
+    });
+    return codes;
+  }, [selectedKelas, availableClasses]);
+
+  const handleSubmitKRS = () => {
+    post('/mahasiswa/krs', {
+      preserveScroll: true,
+      onSuccess: () => {
+        toast.success('KRS berhasil diajukan!');
+        setActiveTab('current');
+      },
+      onError: () => toast.error('Terjadi kesalahan saat mengajukan KRS.'),
+    });
+  };
+
+  const toggleKelas = (kelasId: string) => {
+    const currentIds = [...data.kelas_ids];
+    let newIds: string[];
+    if (currentIds.includes(kelasId)) {
+      newIds = currentIds.filter(id => id !== kelasId);
+    } else {
+      const newTotalSks = [...currentIds, kelasId].reduce((total, id) => {
+        const kelas = availableClasses.find(k => k.id_kelas === id);
+        return total + (kelas?.matakuliah?.sks || 0);
+      }, 0);
+      if (newTotalSks > 24) {
+        toast.error('Batas SKS terlampaui', { description: 'Total SKS tidak boleh melebihi 24.' });
+        return;
+      }
+      newIds = [...currentIds, kelasId];
+    }
+    setData('kelas_ids', newIds);
+  };
+
+  const handleAddKelas = (kelasId: string) => toggleKelas(kelasId);
+  const handleRemoveKelas = (kelasId: string) => toggleKelas(kelasId);
+  
+  const getStatusInfo = (status: number | undefined) => {
+    switch (status) {
+      case 0: return { Icon: Clock, text: "Menunggu Persetujuan", className: "bg-yellow-50 text-yellow-700 border-yellow-200" };
+      case 1: return { Icon: CheckCircle2, text: "Disetujui", className: "bg-green-50 text-green-700 border-green-200" };
+      case 2: return { Icon: XCircle, text: "Ditolak", className: "bg-red-50 text-red-700 border-red-200" };
+      default: return { Icon: Info, text: "Belum Diajukan", className: "bg-red-50 text-red-700 border-red-200" };
+    }
+  };
+  
+  const currentStatus = getStatusInfo(currentKrs?.status_persetujuan);
+  
+  return (
+    <>
+      <Head title="Kartu Rencana Studi" />
+      <div className="space-y-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <h2>Kartu Rencana Studi (KRS)</h2>
+            {activePeriod && (
+              <p className="text-muted-foreground">
+                Periode {activePeriod.tahun}/{activePeriod.tahun + 1} - Semester {activePeriod.semester === 1 ? 'Ganjil' : 'Genap'}
+              </p>
+            )}
+          </div>
+          <Badge variant="outline" className={currentStatus.className}>
+            <currentStatus.Icon className="w-3 h-3 mr-1" />
+            {currentStatus.text}
+          </Badge>
+        </div>
+        
+
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'current' | 'add')} className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="current">KRS Saat Ini</TabsTrigger>
+            <TabsTrigger value="add">Tambah Mata Kuliah</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="current" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>
+                      {currentKrs ? `KRS Semester ${currentKrs.semester}` : 'KRS Saat Ini'}
+                    </CardTitle>
+                    <CardDescription>
+                      {currentKrs && (
+                        <>Diajukan pada {new Date(currentKrs.tanggal_pengajuan).toLocaleDateString('id-ID', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}</>
+                      )}
+                    </CardDescription>
+                  </div>
+                  {currentKrs && getStatusBadge(currentKrs.status_persetujuan)}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    {currentKrs ? (
+                      <>Total SKS yang diambil: <strong>{getTotalSKS()} SKS</strong> dari maksimal 24 SKS</>
+                    ) : (
+                      'Belum ada KRS diajukan.'
+                    )}
+                  </AlertDescription>
+                </Alert>
+
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Kode MK</TableHead>
+                        <TableHead>Nama Mata Kuliah</TableHead>
+                        <TableHead>SKS</TableHead>
+                        <TableHead>Kelas</TableHead>
+                        <TableHead>Dosen</TableHead>
+                        <TableHead>Jadwal</TableHead>
+                        <TableHead>Ruangan</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {currentKrs?.detail_krs?.map((detail: any) => (
+                        <TableRow key={detail.id_detail_krs}>
+                          <TableCell>{detail.kelas?.matakuliah?.kode_mk}</TableCell>
+                          <TableCell>{detail.kelas?.matakuliah?.nama_mk}</TableCell>
+                          <TableCell>{detail.kelas?.matakuliah?.sks}</TableCell>
+                          <TableCell>{detail.kelas?.nama_kelas}</TableCell>
+                          <TableCell>{detail.kelas?.dosen?.nama_dosen}</TableCell>
+                          <TableCell className="text-xs">
+                            {new Date(detail.kelas?.jam_mulai!).toLocaleDateString('id-ID', { weekday: 'short' })},{' '}
+                            {new Date(detail.kelas?.jam_mulai!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} -{' '}
+                            {new Date(detail.kelas?.jam_selesai!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                          </TableCell>
+                          <TableCell className="text-xs">{detail.kelas?.ruangan?.id_ruangan}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {currentKrs && currentKrs.status_persetujuan === 0 && (
+                  <div className="flex gap-2">
+                    <Button onClick={handleSubmitKRS} disabled={processing} variant="secondary">
+                      <Send className="mr-2 h-4 w-4" />
+                      Ajukan Ulang
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      disabled={processing}
+                      onClick={() => {
+                        if (confirm('Batalkan pengajuan KRS ini? Tindakan ini akan menghapus seluruh pilihan kelas.')) {
+                          router.delete('/mahasiswa/krs', {
+                            preserveScroll: true,
+                            onSuccess: () => toast.success('Pengajuan KRS dibatalkan'),
+                            onError: () => toast.error('Gagal membatalkan pengajuan KRS'),
+                          });
+                        }
+                      }}
+                    >
+                      Batalkan Pengajuan
+                    </Button>
+                  </div>
+                )}
+
+                {currentKrs && currentKrs.status_persetujuan === 2 && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      KRS Anda ditolak. Silakan edit dan ajukan kembali.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {currentKrs && currentKrs.status_persetujuan === 1 && (
+                  <Alert className="bg-green-50 border-green-200">
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <AlertDescription className="text-green-800">
+                      KRS Anda telah disetujui oleh dosen pembimbing.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="add" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Tambah Mata Kuliah</CardTitle>
+                <CardDescription>
+                  Pilih mata kuliah yang ingin Anda ambil semester ini
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    Total SKS saat ini: <strong>{getTotalSKS()} SKS</strong> dari maksimal 24 SKS
+                  </AlertDescription>
+                </Alert>
+
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Kode MK</TableHead>
+                        <TableHead>Nama Mata Kuliah</TableHead>
+                        <TableHead>SKS</TableHead>
+                        <TableHead>Jenis</TableHead>
+                        <TableHead>Kelas</TableHead>
+                        <TableHead>Hari</TableHead>
+                        <TableHead>Dosen</TableHead>
+                        <TableHead>Kapasitas</TableHead>
+                        <TableHead>Aksi</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {availableKelas.map((kelas: Kelas) => {
+                        const isSelected = selectedKelas.includes(kelas.id_kelas);
+                        const available = isKelasAvailable(kelas);
+                        const courseAlreadyChosen = !isSelected && kelas.matakuliah?.kode_mk ? selectedCourseCodes.has(kelas.matakuliah.kode_mk) : false;
+                        return (
+                          <TableRow key={kelas.id_kelas} className={courseAlreadyChosen || ((24 - getTotalSKS() < (kelas.matakuliah?.sks ?? 0)) && !isSelected) ? 'opacity-60' : ''}>
+                            <TableCell>{kelas.matakuliah?.kode_mk}</TableCell>
+                            <TableCell>{kelas.matakuliah?.nama_mk}</TableCell>
+                            <TableCell>{kelas.matakuliah?.sks}</TableCell>
+                            <TableCell>
+                              <Badge variant={kelas.matakuliah?.jenis_mk === 1 ? 'default' : 'secondary'}>
+                                {getJenisMK(kelas.matakuliah?.jenis_mk!)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>{kelas.nama_kelas}</TableCell>
+                            <TableCell className="text-xs">
+                            {new Date(kelas?.jam_mulai!).toLocaleDateString('id-ID', { weekday: 'short' })},{' '}
+                            {new Date(kelas?.jam_mulai!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} -{' '}
+                            {new Date(kelas?.jam_selesai!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</TableCell>
+                            <TableCell className="text-xs">{kelas.dosen?.nama_dosen}</TableCell>
+                            <TableCell>
+                              <span className={!available ? 'text-red-600' : ''}>
+                                {kelas.terisi}/{kelas.kapasitas}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              {isSelected ? (
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleRemoveKelas(kelas.id_kelas)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleAddKelas(kelas.id_kelas)}
+                                  disabled={!available || courseAlreadyChosen}
+                                  title={courseAlreadyChosen ? 'Mata kuliah ini sudah dipilih di kelas lain' : ''}
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button onClick={handleSubmitKRS} disabled={selectedKelas.length === 0 || processing}>
+                    <Send className="mr-2 h-4 w-4" />
+                    Simpan dan Ajukan KRS
+                  </Button>
+                  <Button variant="outline" onClick={() => setData('kelas_ids', [])}>
+                    Reset
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </>
+  );
+}

@@ -1,0 +1,5 @@
+const Ziggy = {"url":"http:\/\/localhost:8000","port":8000,"defaults":{},"routes":{"login":{"uri":"login","methods":["GET","HEAD"]},"logout":{"uri":"logout","methods":["POST"]},"signup":{"uri":"signup","methods":["GET","HEAD"]},"mahasiswa.dashboard":{"uri":"mahasiswa\/dashboard","methods":["GET","HEAD"]},"mahasiswa.krs":{"uri":"mahasiswa\/krs","methods":["GET","HEAD"]},"mahasiswa.jadwal":{"uri":"mahasiswa\/jadwal","methods":["GET","HEAD"]},"mahasiswa.nilai":{"uri":"mahasiswa\/nilai","methods":["GET","HEAD"]},"dosen.dashboard":{"uri":"dosen\/dashboard","methods":["GET","HEAD"]},"dosen.persetujuan":{"uri":"dosen\/persetujuan","methods":["GET","HEAD"]},"dosen.kelas":{"uri":"dosen\/kelas","methods":["GET","HEAD"]},"dosen.jadwal":{"uri":"dosen\/jadwal","methods":["GET","HEAD"]},"storage.local":{"uri":"storage\/{path}","methods":["GET","HEAD"],"wheres":{"path":".*"},"parameters":["path"]}}};
+if (typeof window !== 'undefined' && typeof window.Ziggy !== 'undefined') {
+  Object.assign(Ziggy.routes, window.Ziggy.routes);
+}
+export { Ziggy };
