@@ -38,11 +38,24 @@ class KrsController extends Controller {
                 ->get();
         }
 
+        // Fetch waitlisted entries for current mahasiswa in the active period (only for KRS page)
+        $waitlisted = collect();
+        if ($activePeriod) {
+            $waitlisted = \App\Models\KelasWaitlist::whereHas('kelas', function($q) use ($activePeriod) {
+                    $q->where('tahun_akademik_id_tahun_akademik', $activePeriod->id_tahun_akademik);
+                })
+                ->where('mahasiswa_nrp', $mahasiswa->nrp)
+                ->with(['kelas.matakuliah', 'kelas.dosen', 'kelas.ruangan'])
+                ->orderBy('created_at')
+                ->get();
+        }
+
         return Inertia::render('mahasiswa/KRS', [
             'mahasiswa' => $mahasiswa,
             'currentKrs' => $currentKrs,
             'availableClasses' => $availableClasses,
             'activePeriod' => $activePeriod,
+            'waitlisted' => $waitlisted,
         ]);
     }
 

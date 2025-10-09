@@ -121,5 +121,14 @@ export interface Krs {
   tahun_akademik?: TahunAkademik;
   detail_krs?: DetailKrs[];
   total_sks?: number;
+  waitlisted?: KelasWaitlisted[];
+}
+
+export interface KelasWaitlisted {
+  id: string;
+  kelas_id_kelas: string;
+  mahasiswa_nrp: string;
+  created_at: string;
+  kelas?: Kelas;
 }
 

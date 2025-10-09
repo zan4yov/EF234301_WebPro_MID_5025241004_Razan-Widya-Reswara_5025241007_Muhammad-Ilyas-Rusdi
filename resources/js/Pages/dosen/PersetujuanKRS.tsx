@@ -320,6 +320,38 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
                 </TableBody>
               </Table>
             </div>
+            {selectedKRS && (selectedKRS as any).waitlisted && (selectedKRS as any).waitlisted.length > 0 && (
+              <div className="rounded-md border p-3 bg-blue-50/30 border-blue-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Waitlist</Badge>
+                  <span className="text-sm text-blue-800">Mahasiswa ini juga mengantri pada kelas berikut (belum terdaftar resmi).</span>
+                </div>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Kode MK</TableHead>
+                        <TableHead>Nama MK</TableHead>
+                        <TableHead>SKS</TableHead>
+                        <TableHead>Kelas</TableHead>
+                        <TableHead>Dosen</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {(selectedKRS as any).waitlisted.map((w: any) => (
+                        <TableRow key={w.id}>
+                          <TableCell>{w.kelas?.matakuliah?.kode_mk}</TableCell>
+                          <TableCell>{w.kelas?.matakuliah?.nama_mk}</TableCell>
+                          <TableCell>{w.kelas?.matakuliah?.sks}</TableCell>
+                          <TableCell>{w.kelas?.nama_kelas}</TableCell>
+                          <TableCell className="text-xs">{w.kelas?.dosen?.nama_dosen}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
           </div>
           {selectedKRS?.status_persetujuan === 0 && (
             <div className="space-y-2">

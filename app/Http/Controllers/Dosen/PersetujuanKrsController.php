@@ -35,6 +35,19 @@ class PersetujuanKrsController extends Controller {
             $allKrs->each(fn ($krs) => 
                 $krs->total_sks = $krs->detailKrs->sum('kelas.matakuliah.sks')
             );
+
+            // Attach waitlisted classes for each mahasiswa to surface in UI
+            $waitlistByMahasiswa = \App\Models\KelasWaitlist::whereIn('mahasiswa_nrp', $mahasiswaNrp)
+                ->whereHas('kelas', function($q) use ($activePeriod) {
+                    $q->where('tahun_akademik_id_tahun_akademik', $activePeriod->id_tahun_akademik);
+                })
+                ->with(['kelas.matakuliah', 'kelas.dosen'])
+                ->get()
+                ->groupBy('mahasiswa_nrp');
+
+            $allKrs->each(function($krs) use ($waitlistByMahasiswa) {
+                $krs->waitlisted = ($waitlistByMahasiswa[$krs->mahasiswa_nrp] ?? collect())->values();
+            });
         }
         
         $stats = [

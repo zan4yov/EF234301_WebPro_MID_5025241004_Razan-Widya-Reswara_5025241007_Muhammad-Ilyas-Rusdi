@@ -15,9 +15,10 @@ interface KrsPageProps extends PageProps {
   currentKrs: Krs | null;
   availableClasses: Kelas[];
   activePeriod: TahunAkademik | null;
+  waitlisted?: Array<{ id: string; kelas: Kelas; created_at: string }>;
 }
 
-export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, activePeriod }: KrsPageProps) {
+export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, activePeriod, waitlisted = [] }: KrsPageProps) {
   const { data, setData, post, processing } = useForm({
     kelas_ids: currentKrs?.detail_krs?.map(detail => detail.kelas_id_kelas) || [],
   });
@@ -182,6 +183,41 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                     )}
                   </AlertDescription>
                 </Alert>
+
+                {waitlisted.length > 0 && (
+                  <div className="rounded-md border p-4 bg-blue-50/30 border-blue-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Waitlist</Badge>
+                      <span className="text-sm text-blue-800">Anda saat ini dalam antrean untuk kelas berikut. Kelas ini belum dihitung ke total SKS dan tidak akan muncul di tempat lain hingga mendapat kursi.</span>
+                    </div>
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Kode MK</TableHead>
+                            <TableHead>Nama Mata Kuliah</TableHead>
+                            <TableHead>SKS</TableHead>
+                            <TableHead>Kelas</TableHead>
+                            <TableHead>Dosen</TableHead>
+                            <TableHead>Antre Sejak</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {waitlisted.map((w) => (
+                            <TableRow key={w.id}>
+                              <TableCell>{w.kelas?.matakuliah?.kode_mk}</TableCell>
+                              <TableCell>{w.kelas?.matakuliah?.nama_mk}</TableCell>
+                              <TableCell>{w.kelas?.matakuliah?.sks}</TableCell>
+                              <TableCell>{w.kelas?.nama_kelas}</TableCell>
+                              <TableCell className="text-xs">{w.kelas?.dosen?.nama_dosen}</TableCell>
+                              <TableCell className="text-xs">{new Date(w.created_at).toLocaleString('id-ID')}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+                )}
 
                 <div className="rounded-md border">
                   <Table>
