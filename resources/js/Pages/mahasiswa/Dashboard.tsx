@@ -222,8 +222,8 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
                       <p className="text-xs text-muted-foreground">{detail.kelas?.ruangan?.id_ruangan} - {detail.kelas?.ruangan?.tempat_ruangan}</p>
                     </div>
                     <Badge variant="outline">
-                      {new Date(detail.kelas?.jam_mulai!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} - 
-                      {new Date(detail.kelas?.jam_selesai!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(detail.kelas?.jam_mulai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} - 
+                      {new Date(detail.kelas?.jam_selesai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                     </Badge>
                   </div>
                 ))

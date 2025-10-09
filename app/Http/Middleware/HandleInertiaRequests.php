@@ -4,10 +4,8 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
-use Illuminate\Support\Facades\Auth;
 
-class HandleInertiaRequests extends Middleware
-{
+class HandleInertiaRequests extends Middleware {
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -22,8 +20,7 @@ class HandleInertiaRequests extends Middleware
      *
      * @see https://inertiajs.com/asset-versioning
      */
-    public function version(Request $request): ?string
-    {
+    public function version(Request $request): ?string {
         return parent::version($request);
     }
 

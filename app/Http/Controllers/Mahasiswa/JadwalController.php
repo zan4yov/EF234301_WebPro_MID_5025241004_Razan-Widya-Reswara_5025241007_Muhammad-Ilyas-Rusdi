@@ -9,8 +9,7 @@ use Inertia\Response;
 use App\Models\TahunAkademik;
 
 class JadwalController extends Controller {
-    public function index(Request $request): Response
-    {
+    public function index(Request $request): Response {
         $mahasiswa = $request->user()->mahasiswa;
         $activePeriod = TahunAkademik::where('status_aktif', 1)->first();
         $schedule = [];

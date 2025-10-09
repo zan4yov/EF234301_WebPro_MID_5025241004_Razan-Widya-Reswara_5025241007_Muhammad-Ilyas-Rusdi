@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->dateTime('jam_selesai');
             $table->string('matakuliah_kode_mk', 8);
             $table->string('dosen_nidn', 10);
-            $table->string('tahun_akademik_id_tahun_akademik', 16);
+            $table->string('tahun_akademik_id_tahun_akademik', 6);
             $table->string('ruangan_id_ruangan', 5);
             $table->foreign('matakuliah_kode_mk')->references('kode_mk')->on('matakuliah');
             $table->foreign('dosen_nidn')->references('nidn')->on('dosen');

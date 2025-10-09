@@ -13,13 +13,12 @@ class KelasSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
-    {
+    public function run() {
         DB::table('kelas')->delete();
 
         $prodiId = '5025';
         $prodiNama = 'Teknik Informatika';
-        $tahunAkademikGanjil = '0000000000202501';
+        $tahunAkademikGanjil = '202501';
 
         $dosenProdi = DB::table('dosen')->where('program_studi_id_prodi', $prodiId)->get();
         $ruanganProdi = DB::table('ruangan')->where('tempat_ruangan', $prodiNama)->get();

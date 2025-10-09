@@ -25,10 +25,7 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
   const [catatan, setCatatan] = useState('');
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
-  // Centralized grade edit state: id_detail_krs -> nilai_huruf (temp edited value)
-  // Use string keys because backend ids may be serialized as strings
   const [gradeEdits, setGradeEdits] = useState<Record<string, string>>({});
-  // Track saving rows
   const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -50,7 +47,6 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
     setSavingIds(new Set());
   };
 
-  // Populate grade edits when opening dialog
   useEffect(() => {
     if (selectedKRS?.detail_krs) {
       const initial: Record<string, string> = {};
@@ -76,7 +72,6 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
       preserveScroll: true,
       onSuccess: () => {
         toast.success('Nilai disimpan');
-        // Mutate selectedKRS state immutably to reflect new grade
         setSelectedKRS(prev => {
           if (!prev) return prev;
           return {

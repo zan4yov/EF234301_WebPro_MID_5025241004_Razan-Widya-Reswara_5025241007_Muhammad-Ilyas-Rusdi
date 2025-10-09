@@ -22,9 +22,7 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
     kelas_ids: currentKrs?.detail_krs?.map(detail => detail.kelas_id_kelas) || [],
   });
 
-  // Control which tab is visible; switch back to 'current' after successful submit.
   const [activeTab, setActiveTab] = useState<'current' | 'add'>(currentKrs ? 'current' : 'add');
-
   const selectedKelas = data.kelas_ids as string[];
 
   const getStatusBadge = (status: number) => {
@@ -351,7 +349,7 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                 <div className="flex gap-2">
                   <Button onClick={handleSubmitKRS} disabled={selectedKelas.length === 0 || processing}>
                     <Send className="mr-2 h-4 w-4" />
-                    Simpan dan Ajukan KRS
+                    Simpan dan Ajukan
                   </Button>
                   <Button variant="outline" onClick={() => setData('kelas_ids', [])}>
                     Reset

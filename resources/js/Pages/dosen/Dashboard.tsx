@@ -131,7 +131,7 @@ export default function DosenDashboard({ dosen, stats, pendingKrs, todaySchedule
                     <p className="text-xs text-muted-foreground"> {kelas.terisi}/{kelas.kapasitas} mahasiswa</p>
                   </div>
                   <Badge variant="outline">
-                    {new Date(kelas.jam_mulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} - {new Date(kelas.jam_selesai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                    {new Date(kelas.jam_mulai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} - {new Date(kelas.jam_selesai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                   </Badge>
                 </div>
               ))}

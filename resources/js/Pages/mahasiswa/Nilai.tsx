@@ -111,7 +111,7 @@ export default function MahasiswaNilai({ grades, ipk, ips, availableSemesters, s
                     if (approvedGrades.length === 0) {
                       return (
                         <TableRow>
-                          <TableCell colSpan={6} className="text-center">
+                          <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
                             {grades.length === 0
                               ? 'Tidak ada nilai untuk ditampilkan.'
                               : 'Nilai belum tersedia karena KRS untuk semester ini belum disetujui.'}

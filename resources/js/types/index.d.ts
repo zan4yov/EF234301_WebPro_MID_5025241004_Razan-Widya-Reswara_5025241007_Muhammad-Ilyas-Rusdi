@@ -16,7 +16,6 @@ export interface PageProps extends InertiaPageProps {
     };
   };
   url: string;
-  // other props
   flash: {
     message: string | null;
   };
@@ -38,7 +37,7 @@ export interface TahunAkademik {
   id_tahun_akademik: string;
   semester: number;
   tahun: number;
-  status_aktif: number; // 0 for inactive, 1 for active
+  status_aktif: number;
 }
 
 export interface Dosen {
@@ -48,7 +47,6 @@ export interface Dosen {
   user_id: number;
   program_studi_id_prodi: string;
 
-  // Eager-loaded relationships (optional)
   program_studi?: ProgramStudi;
   user?: User;
 }
@@ -65,7 +63,6 @@ export interface Mahasiswa {
   program_studi_id_prodi: string;
   dosen_nidn: string;
 
-  // Eager-loaded relationships (optional)
   program_studi?: ProgramStudi;
   dosen_pembimbing?: Dosen;
   user?: User;
@@ -76,11 +73,10 @@ export interface Matakuliah {
   nama_mk: string;
   sks: number;
   minimal_semester: number;
-  jenis_mk: number; // 1 for Wajib, 2 for Pilihan
+  jenis_mk: number; // 1: Wajib 2: Pilihan
   deskripsi_mk: string | null;
   program_studi_id_prodi: string;
 
-  // Eager-loaded relationships (optional)
   program_studi?: ProgramStudi;
 }
 
@@ -89,14 +85,13 @@ export interface Kelas {
   nama_kelas: string;
   kapasitas: number;
   terisi: number;
-  jam_mulai: string; // ISO 8601 date string
-  jam_selesai: string; // ISO 8601 date string
+  jam_mulai: string;
+  jam_selesai: string;
   matakuliah_kode_mk: string;
   dosen_nidn: string;
   tahun_akademik_id_tahun_akademik: string;
   ruangan_id_ruangan: string;
 
-  // Eager-loaded relationships (optional)
   matakuliah?: Matakuliah;
   dosen?: Dosen;
   tahun_akademik?: TahunAkademik;
@@ -109,7 +104,6 @@ export interface DetailKrs {
   krs_id_krs: string;
   kelas_id_kelas: string;
 
-  // Eager-loaded relationships (optional)
   krs?: Krs;
   kelas?: Kelas;
 }
@@ -117,17 +111,15 @@ export interface DetailKrs {
 export interface Krs {
   id_krs: string;
   status_persetujuan: number; // 0: Pending, 1: Approved, 2: Rejected
-  tanggal_pengajuan: string; // ISO 8601 date string
-  mahasiswa_nrp: string;
+  tanggal_pengajuan: string;
   semester: number;
+  catatan_penolakan: string | null;
+  mahasiswa_nrp: string;
   tahun_akademik_id_tahun_akademik: string;
 
-  // Eager-loaded relationships (optional)
   mahasiswa?: Mahasiswa;
   tahun_akademik?: TahunAkademik;
   detail_krs?: DetailKrs[];
-  
-  // Custom appended attributes (optional)
   total_sks?: number;
 }
 

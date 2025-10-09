@@ -14,7 +14,6 @@ export default function MahasiswaJadwal({ schedule, activePeriod }: JadwalPagePr
 
   const groupedByDay = validSchedule.reduce((acc, detail) => {
     const dayIndex = new Date(detail.kelas!.jam_mulai).getDay(); 
-    
     const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const day = dayNames[dayIndex];
     
@@ -68,11 +67,11 @@ export default function MahasiswaJadwal({ schedule, activePeriod }: JadwalPagePr
                           <div className="flex flex-col items-center justify-center min-w-[80px] p-3 bg-primary/10 rounded-lg">
                             <Clock className="h-4 w-4 text-primary mb-1" />
                             <p className="text-sm">
-                              {new Date(detail.kelas!.jam_mulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                              {new Date(detail.kelas!.jam_mulai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                             </p>
                             <p className="text-sm">-</p>
                             <p className="text-sm">
-                              {new Date(detail.kelas!.jam_selesai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                              {new Date(detail.kelas!.jam_selesai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
                           <div className="flex-1 space-y-2">

@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('krs', function (Blueprint $table) {
             $table->string('id_krs', 32)->primary();
-            $table->integer('status_persetujuan'); // e.g., 0: Pending, 1: Approved, 2: Rejected
+            $table->integer('status_persetujuan'); // 0: Pending, 1: Approved, 2: Rejected
             $table->timestamp('tanggal_pengajuan');
             $table->integer('semester');
             $table->string('catatan_penolakan', 255)->nullable();

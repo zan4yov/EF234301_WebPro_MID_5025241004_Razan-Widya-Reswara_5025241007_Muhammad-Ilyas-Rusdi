@@ -10,8 +10,7 @@ use App\Models\Mahasiswa;
 use App\Models\TahunAkademik;
 use Carbon\Carbon;
 
-class DashboardController extends Controller
-{
+class DashboardController extends Controller {
     public function index(Request $request): Response {
         $mahasiswa = Mahasiswa::with(['programStudi', 'dosenPembimbing'])
             ->findOrFail($request->user()->mahasiswa->nrp);
@@ -28,7 +27,6 @@ class DashboardController extends Controller
                 ->first();
 
             if ($currentKrs) {
-                // Safely compute total SKS
                 $currentKrs->total_sks = $currentKrs->detailKrs->reduce(function ($carry, $detail) {
                     $sks = optional(optional($detail->kelas)->matakuliah)->sks ?? 0;
                     return $carry + $sks;

@@ -44,8 +44,7 @@ class KrsController extends Controller {
         ]);
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         $request->validate([
             'kelas_ids' => ['required', 'array'],
             'kelas_ids.*' => ['string', 'exists:kelas,id_kelas'],
@@ -117,8 +116,7 @@ class KrsController extends Controller {
         return redirect()->route('mahasiswa.krs');
     }
 
-    public function destroy(Request $request)
-    {
+    public function destroy(Request $request) {
         $mahasiswa = $request->user()->mahasiswa;
         $activePeriod = TahunAkademik::where('status_aktif', 1)->first();
         if (!$activePeriod) {
@@ -137,9 +135,7 @@ class KrsController extends Controller {
         try {
             DB::transaction(function () use ($krs) {
                 $kelasIds = $krs->detailKrs->pluck('kelas_id_kelas')->toArray();
-                // Delete details first
                 $krs->detailKrs()->delete();
-                // Delete KRS
                 $krs->delete();
                 if (!empty($kelasIds)) {
                     $counts = DetailKrs::select('kelas_id_kelas', DB::raw('COUNT(*) as jumlah'))

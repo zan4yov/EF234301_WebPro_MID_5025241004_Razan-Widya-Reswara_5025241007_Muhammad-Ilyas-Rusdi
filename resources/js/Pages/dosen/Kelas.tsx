@@ -92,8 +92,8 @@ export default function DosenKelas({ classes, stats, activePeriod }: DosenKelasP
                         <p className="text-sm text-muted-foreground">Jadwal</p>
                         <p className="text-sm">{dayNames[dayIndex]}</p>
                         <p className="text-sm">
-                          {new Date(kelas.jam_mulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                          - {new Date(kelas.jam_selesai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(kelas.jam_mulai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                          - {new Date(kelas.jam_selesai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>

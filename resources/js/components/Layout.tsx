@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import { Button } from './ui/button';
-import { Avatar, AvatarFallback } from './ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import { 
   GraduationCap, 
   LayoutDashboard, 
@@ -46,7 +46,7 @@ export function Layout({ children }: LayoutProps) {
     if (user?.role === 'mahasiswa') {
       return [
         { href: '/mahasiswa/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { href: '/mahasiswa/krs', label: 'KRS Saya', icon: FileText },
+        { href: '/mahasiswa/krs', label: 'Kartu Rencana Studi', icon: FileText },
         { href: '/mahasiswa/jadwal', label: 'Jadwal Kuliah', icon: Calendar },
         { href: '/mahasiswa/nilai', label: 'Nilai', icon: BookOpen },
       ];
