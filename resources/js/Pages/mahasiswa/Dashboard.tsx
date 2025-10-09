@@ -4,16 +4,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BookOpen, Calendar, FileText, CheckCircle2, Clock, XCircle, Info } from 'lucide-react';
-import { PageProps, Mahasiswa, Krs, TahunAkademik, DetailKrs } from '@/types';
+import { PageProps, Mahasiswa, Krs, TahunAkademik, Kelas, Dosen } from '@/types';
 
 interface MahasiswaDashboardProps extends PageProps {
   mahasiswa: Mahasiswa;
   currentKrs: (Krs & { total_sks: number }) | null;
   activePeriod: TahunAkademik | null;
-  todaySchedule: DetailKrs[];
+  todaySchedule: Kelas[];
+  dosen: Dosen[];
 }
 
-export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod, todaySchedule }: MahasiswaDashboardProps) {
+export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod, todaySchedule, dosen }: MahasiswaDashboardProps) {
   const getStatusBadge = (status: number) => {
     if (status === 0) {
       return (
@@ -215,15 +216,20 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
             </CardHeader>
             <CardContent className="space-y-3">
               {todaySchedule.length > 0 ? (
-                todaySchedule.map((detail) => (
-                  <div key={detail.id_detail_krs} className="flex items-start gap-3 p-3 border rounded-lg">
+                todaySchedule.map((kelas) => (
+                  <div key={kelas.id_kelas} className="flex items-start gap-3 p-3 border rounded-lg">
                     <div className="flex-1">
-                      <p className="text-sm">{detail.kelas?.matakuliah?.nama_mk}</p>
-                      <p className="text-xs text-muted-foreground">{detail.kelas?.ruangan?.id_ruangan} - {detail.kelas?.ruangan?.tempat_ruangan}</p>
+                      <p className="text-sm">{kelas.matakuliah?.nama_mk}</p>
+                      <p className="text-xs text-muted-foreground">{kelas.ruangan?.id_ruangan} - {kelas.ruangan?.tempat_ruangan}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {(() => {
+                          const d = dosen?.find((x) => x.nidn === kelas.dosen_nidn);
+                          return d?.nama_dosen || '-';
+                        })()}
+                      </p>
                     </div>
                     <Badge variant="outline">
-                      {new Date(detail.kelas?.jam_mulai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} - 
-                      {new Date(detail.kelas?.jam_selesai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                      {new Date(kelas.jam_mulai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} - {new Date(kelas.jam_selesai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                     </Badge>
                   </div>
                 ))

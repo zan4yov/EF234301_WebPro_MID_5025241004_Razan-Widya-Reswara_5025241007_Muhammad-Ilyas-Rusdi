@@ -93,6 +93,23 @@ class UserSeeder extends Seeder {
                 'program_studi_id_prodi' => '5025',
                 'dosen_nidn' => $nidn4,
             ]);
+
+            $mahasiswaUser2 = User::create([
+                'email' => '5025241000@its.ac.id',
+                'password' => Hash::make('password'),
+                'role' => 'mahasiswa',
+            ]);
+
+            Mahasiswa::create([
+                'user_id' => $mahasiswaUser2->id,
+                'nrp' => '5025241000',
+                'nama' => 'Test Queue',
+                'angkatan' => 2024,
+                'semester' => 3,
+                'status_mahasiswa' => 'Aktif',
+                'program_studi_id_prodi' => '5025',
+                'dosen_nidn' => $nidn4,
+            ]);
         });
     }
 }

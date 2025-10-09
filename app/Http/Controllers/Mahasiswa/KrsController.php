@@ -10,6 +10,8 @@ use App\Models\TahunAkademik;
 use App\Models\Kelas;
 use App\Models\Krs;
 use App\Models\DetailKrs;
+use App\Models\KelasWaitlist;
+use App\Models\Mahasiswa;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -85,6 +87,15 @@ class KrsController extends Controller {
                 $krs->detailKrs()->delete();
                 $details = [];
                 foreach ($request->kelas_ids as $kelasId) {
+                    $kelas = Kelas::find($kelasId);
+                    $currentTaken = DetailKrs::where('kelas_id_kelas', $kelasId)->count();
+                    if ($kelas && $currentTaken >= ($kelas->kapasitas ?? 0)) {
+                        KelasWaitlist::firstOrCreate([
+                            'kelas_id_kelas' => $kelasId,
+                            'mahasiswa_nrp' => $mahasiswa->nrp,
+                        ]);
+                        continue;
+                    }
                     $details[] = [
                         'id_detail_krs' => str_replace('-', '', (string) Str::uuid()),
                         'krs_id_krs' => $krs->id_krs,
@@ -106,6 +117,55 @@ class KrsController extends Controller {
                         Kelas::where('id_kelas', $kelasId)->update([
                             'terisi' => $counts[$kelasId] ?? 0,
                         ]);
+                    }
+
+                    foreach ($affected as $kelasId) {
+                        $kelas = Kelas::lockForUpdate()->find($kelasId);
+                        if (!$kelas) continue;
+                        $kapasitas = $kelas->kapasitas ?? 0;
+                        if ($kapasitas <= 0) continue;
+
+                        $taken = DetailKrs::where('kelas_id_kelas', $kelasId)->count();
+                        while ($taken < $kapasitas) {
+                            $next = KelasWaitlist::where('kelas_id_kelas', $kelasId)
+                                ->orderBy('created_at')
+                                ->first();
+                            if (!$next) break;
+
+                            $krsPromote = Krs::firstOrCreate(
+                                [
+                                    'mahasiswa_nrp' => $next->mahasiswa_nrp,
+                                    'tahun_akademik_id_tahun_akademik' => $kelas->tahun_akademik_id_tahun_akademik,
+                                ],
+                                [
+                                    'id_krs' => str_replace('-', '', (string) Str::uuid()),
+                                    'status_persetujuan' => 0,
+                                    'tanggal_pengajuan' => now(),
+                                    'semester' => Mahasiswa::find($next->mahasiswa_nrp)?->semester ?? 1,
+                                ]
+                            );
+
+                            $already = DetailKrs::where('krs_id_krs', $krsPromote->id_krs)
+                                ->where('kelas_id_kelas', $kelasId)
+                                ->exists();
+                            if ($already) {
+                                $next->delete();
+                                continue;
+                            }
+
+                            DetailKrs::create([
+                                'id_detail_krs' => str_replace('-', '', (string) Str::uuid()),
+                                'krs_id_krs' => $krsPromote->id_krs,
+                                'kelas_id_kelas' => $kelasId,
+                            ]);
+
+                            $next->delete();
+                            $taken++;
+                        }
+
+                        if ($taken != ($counts[$kelasId] ?? 0)) {
+                            $kelas->update(['terisi' => $taken]);
+                        }
                     }
                 }
             });
@@ -146,6 +206,39 @@ class KrsController extends Controller {
                         Kelas::where('id_kelas', $kelasId)->update([
                             'terisi' => $counts[$kelasId] ?? 0,
                         ]);
+                        
+                        $kelas = Kelas::find($kelasId);
+                        $taken = $counts[$kelasId] ?? 0;
+                        if ($kelas && $taken < ($kelas->kapasitas ?? 0)) {
+                            $next = KelasWaitlist::where('kelas_id_kelas', $kelasId)
+                                ->orderBy('created_at')
+                                ->first();
+                            if ($next) {
+                                $activePeriod = TahunAkademik::where('status_aktif', 1)->first();
+                                if ($activePeriod) {
+                                    $krsPromote = Krs::firstOrCreate(
+                                        [
+                                            'mahasiswa_nrp' => $next->mahasiswa_nrp,
+                                            'tahun_akademik_id_tahun_akademik' => $kelas->tahun_akademik_id_tahun_akademik,
+                                        ],
+                                        [
+                                            'id_krs' => str_replace('-', '', (string) Str::uuid()),
+                                            'status_persetujuan' => 0,
+                                            'tanggal_pengajuan' => now(),
+                                            'semester' => Mahasiswa::find($next->mahasiswa_nrp)?->semester ?? 1,
+                                        ]
+                                    );
+                                    DetailKrs::create([
+                                        'id_detail_krs' => str_replace('-', '', (string) Str::uuid()),
+                                        'krs_id_krs' => $krsPromote->id_krs,
+                                        'kelas_id_kelas' => $kelasId,
+                                    ]);
+                                    $next->delete();
+                                    $newTaken = DetailKrs::where('kelas_id_kelas', $kelasId)->count();
+                                    $kelas->update(['terisi' => $newTaken]);
+                                }
+                            }
+                        }
                     }
                 }
             });

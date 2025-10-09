@@ -285,7 +285,7 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
                           {detail.kelas?.jam_mulai && (
                             <>
                               {new Date(detail.kelas.jam_mulai).toLocaleDateString('id-ID', { weekday: 'short' })},{' '}
-                              {new Date(detail.kelas.jam_mulai).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                              {new Date(detail.kelas.jam_mulai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                             </>
                           )}
                         </TableCell>

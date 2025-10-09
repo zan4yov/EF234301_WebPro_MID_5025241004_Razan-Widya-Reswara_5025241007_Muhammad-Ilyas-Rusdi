@@ -52,7 +52,7 @@ class KelasSeeder extends Seeder
                     $allKelas[] = [
                         'id_kelas' => $matakuliah->kode_mk . '-' . $varian,
                         'nama_kelas' => $matakuliah->nama_mk . ' - Kelas ' . $varian,
-                        'kapasitas' => 40,
+                        'kapasitas' => 1,
                         'terisi' => 0,
                         'jam_mulai' => $baseDate->copy()->setTimeFromTimeString($timeSlot['start']),
                         'jam_selesai' => $baseDate->copy()->setTimeFromTimeString($timeSlot['end']),

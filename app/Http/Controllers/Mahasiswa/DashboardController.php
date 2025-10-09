@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Dosen;
 use App\Models\Mahasiswa;
 use App\Models\TahunAkademik;
 use Carbon\Carbon;
@@ -19,6 +20,7 @@ class DashboardController extends Controller {
         
         $currentKrs = null;
         $todaySchedule = [];
+        $dosen = [];
 
         if ($activePeriod) {
             $currentKrs = $mahasiswa->krs()
@@ -34,12 +36,29 @@ class DashboardController extends Controller {
 
                 $dayOfWeek = Carbon::now()->dayOfWeekIso;
                 $todaySchedule = $currentKrs->detailKrs
-                    ->filter(function ($detail) use ($dayOfWeek) {
-                        return optional($detail->kelas)->hari == $dayOfWeek;
+                    ->map(function ($detail) {
+                        return optional($detail)->kelas;
+                    })
+                    ->filter()
+                    ->filter(function ($kelas) use ($dayOfWeek) {
+                        if (!$kelas || !$kelas->jam_mulai) return false;
+                        $start = Carbon::parse($kelas->jam_mulai);
+                        return $start->dayOfWeekIso === $dayOfWeek;
+                    })
+                    ->sortBy(function ($kelas) {
+                        return $kelas->jam_mulai ?? null;
                     })
                     ->take(3)
                     ->values()
                     ->all();
+
+                $dosen = Dosen::whereIn('nidn', collect($todaySchedule)
+                ->pluck('dosen_nidn')
+                ->filter()
+                ->unique()
+                ->values()
+                ->all())
+                ->get();
             }
         }
         
@@ -48,6 +67,7 @@ class DashboardController extends Controller {
             'currentKrs' => $currentKrs,
             'activePeriod' => $activePeriod,
             'todaySchedule' => $todaySchedule,
+            'dosen' => $dosen,
         ]);
     }
 }

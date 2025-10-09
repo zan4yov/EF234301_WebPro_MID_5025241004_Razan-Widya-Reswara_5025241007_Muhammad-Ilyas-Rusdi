@@ -206,8 +206,8 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                           <TableCell>{detail.kelas?.dosen?.nama_dosen}</TableCell>
                           <TableCell className="text-xs">
                             {new Date(detail.kelas?.jam_mulai!).toLocaleDateString('id-ID', { weekday: 'short' })},{' '}
-                            {new Date(detail.kelas?.jam_mulai!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} -{' '}
-                            {new Date(detail.kelas?.jam_selesai!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(detail.kelas?.jam_mulai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} -{' '}
+                            {new Date(detail.kelas?.jam_selesai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                           </TableCell>
                           <TableCell className="text-xs">{detail.kelas?.ruangan?.id_ruangan}</TableCell>
                         </TableRow>
@@ -310,13 +310,20 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                             <TableCell>{kelas.nama_kelas}</TableCell>
                             <TableCell className="text-xs">
                             {new Date(kelas?.jam_mulai!).toLocaleDateString('id-ID', { weekday: 'short' })},{' '}
-                            {new Date(kelas?.jam_mulai!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} -{' '}
-                            {new Date(kelas?.jam_selesai!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</TableCell>
+                            {new Date(kelas?.jam_mulai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} -{' '}
+                            {new Date(kelas?.jam_selesai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}</TableCell>
                             <TableCell className="text-xs">{kelas.dosen?.nama_dosen}</TableCell>
                             <TableCell>
-                              <span className={!available ? 'text-red-600' : ''}>
-                                {kelas.terisi}/{kelas.kapasitas}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className={!available ? 'text-red-600' : ''}>
+                                  {kelas.terisi}/{kelas.kapasitas}
+                                </span>
+                                {!available && (
+                                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                    Waitlist
+                                  </Badge>
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell>
                               {isSelected ? (
@@ -332,10 +339,17 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                                   size="sm"
                                   variant="outline"
                                   onClick={() => handleAddKelas(kelas.id_kelas)}
-                                  disabled={!available || courseAlreadyChosen}
-                                  title={courseAlreadyChosen ? 'Mata kuliah ini sudah dipilih di kelas lain' : ''}
+                                  disabled={courseAlreadyChosen}
+                                  title={courseAlreadyChosen ? 'Mata kuliah ini sudah dipilih di kelas lain' : (!available ? 'Kelas penuh, Anda akan masuk waitlist' : '')}
                                 >
-                                  <Plus className="h-4 w-4" />
+                                  {available ? (
+                                    <Plus className="h-4 w-4" />
+                                  ) : (
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-4 w-4" />
+                                      <span>Antri</span>
+                                    </div>
+                                  )}
                                 </Button>
                               )}
                             </TableCell>
