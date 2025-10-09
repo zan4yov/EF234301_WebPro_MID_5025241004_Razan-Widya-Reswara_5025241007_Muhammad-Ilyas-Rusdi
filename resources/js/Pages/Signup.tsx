@@ -164,11 +164,17 @@ export default function Signup({ programStudis, listDosen }: SignupProps) {
                   <SelectValue placeholder="Pilih Dosen Pembimbing" />
                 </SelectTrigger>
                 <SelectContent>
-                  { listDosen.filter(d => d.program_studi_id_prodi === data.prodi).map((dosen) => (
-                    <SelectItem key={dosen.nidn} value={dosen.nidn}>
-                      {dosen.nama_dosen}
+                  { data.prodi === '' ? ( 
+                    <SelectItem value='none'>
+                      PILIH PROGRAM STUDI TERLEBIH DAHULU
                     </SelectItem>
-                  ))}
+                  ) : (
+                    listDosen.filter(d => d.program_studi_id_prodi === data.prodi).map((dosen) => (
+                      <SelectItem key={dosen.nidn} value={dosen.nidn}>
+                        {dosen.nama_dosen}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
               {errors.dosen_nidn && <p className="text-sm text-red-500 mt-1">{errors.prodi}</p>}

@@ -43,7 +43,7 @@ class RegisteredUserController extends Controller {
             'nidn' => ['nullable', 'string', 'max:10', 'unique:' . Dosen::class, 'required_if:role,dosen'],
             'telp' => ['required', 'string', 'max:16'],
             'prodi' => ['required', 'string', Rule::exists('program_studi', 'id_prodi')],
-            'dosen_nidn' => ['required', 'string', 'max:10', 'required_if:role,mahasiswa'],
+            'dosen_nidn' => ['required', 'string', 'max:10', 'required_if:role,mahasiswa', Rule::notIn('none')],
         ]);
 
         try {
