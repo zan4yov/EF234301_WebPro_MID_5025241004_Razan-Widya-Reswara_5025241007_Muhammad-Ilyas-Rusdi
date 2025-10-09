@@ -33,32 +33,34 @@ class DashboardController extends Controller {
                     $sks = optional(optional($detail->kelas)->matakuliah)->sks ?? 0;
                     return $carry + $sks;
                 }, 0);
+                
+                if ($currentKrs->status_persetujuan === 1) {
+                    $dayOfWeek = Carbon::now()->dayOfWeekIso;
+                    $todaySchedule = $currentKrs->detailKrs
+                        ->map(function ($detail) {
+                            return optional($detail)->kelas;
+                        })
+                        ->filter()
+                        ->filter(function ($kelas) use ($dayOfWeek) {
+                            if (!$kelas || !$kelas->jam_mulai) return false;
+                            $start = Carbon::parse($kelas->jam_mulai);
+                            return $start->dayOfWeekIso === $dayOfWeek;
+                        })
+                        ->sortBy(function ($kelas) {
+                            return $kelas->jam_mulai ?? null;
+                        })
+                        ->take(3)
+                        ->values()
+                        ->all();
 
-                $dayOfWeek = Carbon::now()->dayOfWeekIso;
-                $todaySchedule = $currentKrs->detailKrs
-                    ->map(function ($detail) {
-                        return optional($detail)->kelas;
-                    })
+                    $dosen = Dosen::whereIn('nidn', collect($todaySchedule)
+                    ->pluck('dosen_nidn')
                     ->filter()
-                    ->filter(function ($kelas) use ($dayOfWeek) {
-                        if (!$kelas || !$kelas->jam_mulai) return false;
-                        $start = Carbon::parse($kelas->jam_mulai);
-                        return $start->dayOfWeekIso === $dayOfWeek;
-                    })
-                    ->sortBy(function ($kelas) {
-                        return $kelas->jam_mulai ?? null;
-                    })
-                    ->take(3)
+                    ->unique()
                     ->values()
-                    ->all();
-
-                $dosen = Dosen::whereIn('nidn', collect($todaySchedule)
-                ->pluck('dosen_nidn')
-                ->filter()
-                ->unique()
-                ->values()
-                ->all())
-                ->get();
+                    ->all())
+                    ->get();
+                }
             }
         }
         

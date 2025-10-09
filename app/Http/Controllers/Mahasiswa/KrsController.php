@@ -38,10 +38,9 @@ class KrsController extends Controller {
                 ->get();
         }
 
-        // Fetch waitlisted entries for current mahasiswa in the active period (only for KRS page)
         $waitlisted = collect();
         if ($activePeriod) {
-            $waitlisted = \App\Models\KelasWaitlist::whereHas('kelas', function($q) use ($activePeriod) {
+            $waitlisted = KelasWaitlist::whereHas('kelas', function($q) use ($activePeriod) {
                     $q->where('tahun_akademik_id_tahun_akademik', $activePeriod->id_tahun_akademik);
                 })
                 ->where('mahasiswa_nrp', $mahasiswa->nrp)
@@ -119,6 +118,24 @@ class KrsController extends Controller {
                     DetailKrs::insert($details);
                 }
 
+                if (!empty($request->kelas_ids)) {
+                    $selectedCourseCodes = Kelas::whereIn('id_kelas', $request->kelas_ids)
+                        ->pluck('matakuliah_kode_mk')
+                        ->filter()
+                        ->unique()
+                        ->values();
+
+                    if ($selectedCourseCodes->isNotEmpty()) {
+                        KelasWaitlist::where('mahasiswa_nrp', $mahasiswa->nrp)
+                            ->whereHas('kelas', function($q) use ($activePeriod, $selectedCourseCodes, $request) {
+                                $q->where('tahun_akademik_id_tahun_akademik', $activePeriod->id_tahun_akademik)
+                                  ->whereIn('matakuliah_kode_mk', $selectedCourseCodes)
+                                  ->whereNotIn('id_kelas', $request->kelas_ids);
+                            })
+                            ->delete();
+                    }
+                }
+
                 $affected = array_unique(array_merge($originalKelasIds, $request->kelas_ids));
                 if (!empty($affected)) {
                     $counts = DetailKrs::select('kelas_id_kelas', DB::raw('COUNT(*) as jumlah'))
@@ -180,6 +197,21 @@ class KrsController extends Controller {
                             $kelas->update(['terisi' => $taken]);
                         }
                     }
+
+                    $krs->load(['detailKrs.kelas.matakuliah']);
+                    $actualSks = $krs->detailKrs->reduce(function ($carry, $d) {
+                        return $carry + (int)($d->kelas->matakuliah->sks ?? 0);
+                    }, 0);
+                    $remaining = max(0, 24 - $actualSks);
+
+                    KelasWaitlist::where('mahasiswa_nrp', $mahasiswa->nrp)
+                        ->whereHas('kelas', function ($q) use ($activePeriod, $remaining) {
+                            $q->where('tahun_akademik_id_tahun_akademik', $activePeriod->id_tahun_akademik)
+                              ->whereHas('matakuliah', function ($mq) use ($remaining) {
+                                  $mq->where('sks', '>', $remaining);
+                              });
+                        })
+                        ->delete();
                 }
             });
         } catch (\Throwable $e) {

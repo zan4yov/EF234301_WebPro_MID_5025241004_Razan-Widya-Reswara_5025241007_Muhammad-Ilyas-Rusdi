@@ -9,8 +9,8 @@ use Inertia\Response;
 use App\Models\Krs;
 use App\Models\TahunAkademik;
 use App\Models\DetailKrs;
+use App\Models\KelasWaitlist;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Gate;
 
 class PersetujuanKrsController extends Controller {
     public function index(Request $request): Response {
@@ -36,8 +36,7 @@ class PersetujuanKrsController extends Controller {
                 $krs->total_sks = $krs->detailKrs->sum('kelas.matakuliah.sks')
             );
 
-            // Attach waitlisted classes for each mahasiswa to surface in UI
-            $waitlistByMahasiswa = \App\Models\KelasWaitlist::whereIn('mahasiswa_nrp', $mahasiswaNrp)
+            $waitlistByMahasiswa = KelasWaitlist::whereIn('mahasiswa_nrp', $mahasiswaNrp)
                 ->whereHas('kelas', function($q) use ($activePeriod) {
                     $q->where('tahun_akademik_id_tahun_akademik', $activePeriod->id_tahun_akademik);
                 })

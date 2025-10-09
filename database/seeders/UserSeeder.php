@@ -78,8 +78,8 @@ class UserSeeder extends Seeder {
             ]);
 
             $mahasiswaUser = User::create([
-                'email' => '5025241127@its.ac.id',
-                'password' => Hash::make('Moch1234!'),
+                'email' => '5025241127@student.its.ac.id',
+                'password' => Hash::make('password'),
                 'role' => 'mahasiswa',
             ]);
 
@@ -95,15 +95,15 @@ class UserSeeder extends Seeder {
             ]);
 
             $mahasiswaUser2 = User::create([
-                'email' => '5025241000@its.ac.id',
+                'email' => '5025241004@student.its.ac.id',
                 'password' => Hash::make('password'),
                 'role' => 'mahasiswa',
             ]);
 
             Mahasiswa::create([
                 'user_id' => $mahasiswaUser2->id,
-                'nrp' => '5025241000',
-                'nama' => 'Test Queue',
+                'nrp' => '5025241004',
+                'nama' => 'Razan Widya Reswara',
                 'angkatan' => 2024,
                 'semester' => 3,
                 'status_mahasiswa' => 'Aktif',
