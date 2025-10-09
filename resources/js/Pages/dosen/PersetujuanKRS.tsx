@@ -366,7 +366,7 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
             </div>
           )}
           <DialogFooter>
-            {selectedKRS?.status_persetujuan === 0 ? (
+            {selectedKRS?.status_persetujuan === 0 && (
               <>
                 <Button variant="outline" onClick={resetDialog}>Tutup</Button>
                 <Button variant="destructive" onClick={handleReject} disabled={rejecting}>
@@ -376,7 +376,16 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
                   <CheckCircle2 className="mr-2 h-4 w-4" /> Setujui
                 </Button>
               </>
-            ) : (
+            )}
+            {selectedKRS?.status_persetujuan === 2 && (
+              <>
+                <Button onClick={resetDialog}>Tutup</Button>
+                <Button variant="outline" onClick={handleApprove} disabled={approving}>
+                  <CheckCircle2 className="mr-2 h-4 w-4" /> Setujui
+                </Button>
+              </>
+            )}
+            {selectedKRS?.status_persetujuan === 1 && (
               <Button onClick={resetDialog}>Tutup</Button>
             )}
           </DialogFooter>

@@ -277,12 +277,26 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                 )}
 
                 {currentKrs && currentKrs.status_persetujuan === 2 && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      KRS Anda ditolak. Silakan edit dan ajukan kembali.
-                    </AlertDescription>
-                  </Alert>
+                  <>
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        KRS Anda ditolak. Silakan edit dan ajukan kembali.
+                      </AlertDescription>
+                    </Alert>
+                    <Card>
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <CardTitle>
+                            Catatan Penolakan
+                          </CardTitle>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        { currentKrs.catatan_penolakan }
+                      </CardContent>
+                    </Card>
+                  </>
                 )}
 
                 {currentKrs && currentKrs.status_persetujuan === 1 && (
