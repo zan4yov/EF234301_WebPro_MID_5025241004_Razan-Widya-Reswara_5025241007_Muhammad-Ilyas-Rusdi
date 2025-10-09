@@ -6,14 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ProgramStudi } from '@/types'
+import { ProgramStudi, Dosen } from '@/types'
 import { GraduationCap } from 'lucide-react';
 
 interface SignupProps {
   programStudis: ProgramStudi[];
+  listDosen: Dosen[];
 }
 
-export default function Signup({ programStudis }: SignupProps) {
+export default function Signup({ programStudis, listDosen }: SignupProps) {
   const { data, setData, post, processing, errors } = useForm({
     role: 'mahasiswa',
     name: '',
@@ -24,6 +25,7 @@ export default function Signup({ programStudis }: SignupProps) {
     nidn: '',
     telp: '',
     prodi: '',
+    dosen_nidn: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -153,6 +155,25 @@ export default function Signup({ programStudis }: SignupProps) {
               </Select>
               {errors.prodi && <p className="text-sm text-red-500 mt-1">{errors.prodi}</p>}
             </div>
+
+            {data.role === 'mahasiswa' && (
+            <div className="space-y-2">
+              <Label htmlFor="dosen_nidn">Dosen Pembimbing</Label>
+              <Select value={data.dosen_nidn} onValueChange={(value) => setData('dosen_nidn', value)}>
+                <SelectTrigger id="dosen_nidn" className={(errors.role ? 'border-red-500' : '') + "bg-input-background w-full"}>
+                  <SelectValue placeholder="Pilih Dosen Pembimbing" />
+                </SelectTrigger>
+                <SelectContent>
+                  { listDosen.filter(d => d.program_studi_id_prodi === data.prodi).map((dosen) => (
+                    <SelectItem key={dosen.nidn} value={dosen.nidn}>
+                      {dosen.nama_dosen}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.dosen_nidn && <p className="text-sm text-red-500 mt-1">{errors.prodi}</p>}
+            </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">

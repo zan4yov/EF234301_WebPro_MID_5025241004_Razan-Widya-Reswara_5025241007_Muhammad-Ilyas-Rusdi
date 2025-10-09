@@ -20,9 +20,11 @@ use Illuminate\Support\Facades\DB;
 class RegisteredUserController extends Controller {
     public function create(): Response {
         $programStudis = ProgramStudi::orderBy('nama_prodi', 'asc')->get();
+        $dosen = Dosen::orderBy('nama_dosen', 'asc')->get();
 
         return Inertia::render('Signup', [
             'programStudis' => $programStudis,
+            'listDosen' => $dosen,
         ]);
     }
 
@@ -40,7 +42,8 @@ class RegisteredUserController extends Controller {
             'nrp' => ['nullable', 'string', 'max:10', 'unique:' . Mahasiswa::class, 'required_if:role,mahasiswa'],
             'nidn' => ['nullable', 'string', 'max:10', 'unique:' . Dosen::class, 'required_if:role,dosen'],
             'telp' => ['required', 'string', 'max:16'],
-            'prodi' => ['required', 'string', Rule::exists('program_studi', 'id_prodi')]
+            'prodi' => ['required', 'string', Rule::exists('program_studi', 'id_prodi')],
+            'dosen_nidn' => ['required', 'string', 'max:10', 'required_if:role,mahasiswa'],
         ]);
 
         try {
@@ -59,8 +62,9 @@ class RegisteredUserController extends Controller {
                         'no_telepon' => $request->telp,
                         'program_studi_id_prodi' => $request->prodi,
                         'angkatan' => now()->year,
-                        'semester' => 1,
+                        'semester' => 5,
                         'status_mahasiswa' => 'Aktif',
+                        'dosen_nidn' => $request->dosen_nidn,
                     ]);
                 } else if ($request->role === 'dosen') {
                     Dosen::create([
