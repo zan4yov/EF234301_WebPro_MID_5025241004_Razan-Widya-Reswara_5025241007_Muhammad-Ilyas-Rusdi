@@ -29,9 +29,9 @@ export default function Login() {
               <GraduationCap className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-center">Sistem KRS Online</CardTitle>
+          <CardTitle className="text-center">Online KRS System</CardTitle>
           <CardDescription className="text-center">
-            Masuk ke akun Anda untuk melanjutkan
+            Sign in to your account to continue
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -72,12 +72,12 @@ export default function Login() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={processing}>
-              Masuk
+              Log In
             </Button>
             <p className="text-sm text-center text-muted-foreground">
-              Belum punya akun?{' '}
+              Don't have account?{' '}
               <Link href="/signup" className="text-primary hover:underline">
-                Daftar di sini
+                Register here
               </Link>
             </p>
           </CardFooter>

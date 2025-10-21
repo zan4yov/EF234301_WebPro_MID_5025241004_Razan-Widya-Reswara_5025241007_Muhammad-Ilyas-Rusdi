@@ -48,29 +48,29 @@ export default function Signup({ programStudis, listDosen }: SignupProps) {
               <GraduationCap className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-center">Daftar Akun Baru</CardTitle>
+          <CardTitle className="text-center">Register New Account</CardTitle>
           <CardDescription className="text-center">
-            Lengkapi data di bawah untuk membuat akun
+            Complete the data below to create an account
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit} className="space-y-6">
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="role">Daftar Sebagai</Label>
+              <Label htmlFor="role">Register As</Label>
               <Select value={data.role} onValueChange={(value) => setData('role', value)}>
                 <SelectTrigger id="role" className={(errors.role ? 'border-red-500' : '') + "bg-input-background w-full"}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="mahasiswa">Mahasiswa</SelectItem>
-                  <SelectItem value="dosen">Dosen</SelectItem>
+                  <SelectItem value="mahasiswa">Students</SelectItem>
+                  <SelectItem value="dosen">Lecturers</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nama Lengkap</Label>
+                <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
                   placeholder="Masukkan nama lengkap"
@@ -100,7 +100,7 @@ export default function Signup({ programStudis, listDosen }: SignupProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {data.role === 'mahasiswa' ? (
                   <div className="space-y-2">
-                    <Label htmlFor="nrp">NRP</Label>
+                    <Label htmlFor="nrp">Student ID</Label>
                     <Input
                       id="nrp"
                       placeholder="5025251000"
@@ -113,7 +113,7 @@ export default function Signup({ programStudis, listDosen }: SignupProps) {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <Label htmlFor="nidn">NIDN</Label>
+                    <Label htmlFor="nidn">Lecturer ID</Label>
                     <Input
                       id="nidn"
                       placeholder="0101018801"
@@ -126,7 +126,7 @@ export default function Signup({ programStudis, listDosen }: SignupProps) {
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label htmlFor="telp">No. Telepon</Label>
+                  <Label htmlFor="telp">Phone Number</Label>
                   <Input
                     id="telp"
                     placeholder="081123456789"
@@ -140,7 +140,7 @@ export default function Signup({ programStudis, listDosen }: SignupProps) {
               </div>
             
             <div className="space-y-2">
-              <Label htmlFor="prodi">Program Studi</Label>
+              <Label htmlFor="prodi">Major</Label>
               <Select value={data.prodi} onValueChange={(value) => setData('prodi', value)}>
                 <SelectTrigger id="prodi" className={(errors.role ? 'border-red-500' : '') + "bg-input-background w-full"}>
                   <SelectValue placeholder="Pilih program studi" />
@@ -158,7 +158,7 @@ export default function Signup({ programStudis, listDosen }: SignupProps) {
 
             {data.role === 'mahasiswa' && (
             <div className="space-y-2">
-              <Label htmlFor="dosen_nidn">Dosen Pembimbing</Label>
+              <Label htmlFor="dosen_nidn">Personal Lecturer</Label>
               <Select value={data.dosen_nidn} onValueChange={(value) => setData('dosen_nidn', value)}>
                 <SelectTrigger id="dosen_nidn" className={(errors.role ? 'border-red-500' : '') + "bg-input-background w-full"}>
                   <SelectValue placeholder="Pilih Dosen Pembimbing" />
@@ -166,7 +166,7 @@ export default function Signup({ programStudis, listDosen }: SignupProps) {
                 <SelectContent>
                   { data.prodi === '' ? ( 
                     <SelectItem value='none'>
-                      PILIH PROGRAM STUDI TERLEBIH DAHULU
+                      SELECT A STUDY PROGRAM FIRST
                     </SelectItem>
                   ) : (
                     listDosen.filter(d => d.program_studi_id_prodi === data.prodi).map((dosen) => (
@@ -197,7 +197,7 @@ export default function Signup({ programStudis, listDosen }: SignupProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password_confirmation">Konfirmasi Password</Label>
+                <Label htmlFor="password_confirmation">Confirm Password</Label>
                 <Input
                   id="password_confirmation"
                   type="password"
@@ -212,12 +212,12 @@ export default function Signup({ programStudis, listDosen }: SignupProps) {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={processing}>
-              Daftar
+              Register
             </Button>
             <p className="text-sm text-center text-muted-foreground">
-              Sudah punya akun?{' '}
+              Have account already?{' '}
               <Link href="/login" className="text-primary hover:underline">
-                Masuk di sini
+                Log In here
               </Link>
             </p>
           </CardFooter>

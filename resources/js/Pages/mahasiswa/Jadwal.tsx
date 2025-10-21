@@ -14,7 +14,7 @@ export default function MahasiswaJadwal({ schedule, activePeriod }: JadwalPagePr
 
   const groupedByDay = validSchedule.reduce((acc, detail) => {
     const dayIndex = new Date(detail.kelas!.jam_mulai).getDay(); 
-    const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const day = dayNames[dayIndex];
     
     if (!acc[day]) {
@@ -24,20 +24,20 @@ export default function MahasiswaJadwal({ schedule, activePeriod }: JadwalPagePr
     return acc;
   }, {} as Record<string, DetailKrs[]>);
 
-  const daysOrder = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+  const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   return (
     <>
-      <Head title="Jadwal Kuliah" />
+      <Head title="Class Schedule" />
       <div className="space-y-6">
         <div>
-          <h2>Jadwal Kuliah</h2>
+          <h2>Class Schedule</h2>
           {activePeriod ? (
             <p className="text-muted-foreground">
-              Jadwal perkuliahan untuk periode {activePeriod.tahun}/{activePeriod.tahun + 1} - Semester {activePeriod.semester === 1 ? 'Ganjil' : 'Genap'}
+              Schedule for academic year {activePeriod.tahun}/{activePeriod.tahun + 1} — {activePeriod.semester === 1 ? 'Odd Semester' : 'Even Semester'}
             </p>
           ) : (
-            <p className="text-muted-foreground">Tidak ada periode akademik yang aktif.</p>
+            <p className="text-muted-foreground">No active academic period.</p>
           )}
         </div>
 
@@ -58,7 +58,7 @@ export default function MahasiswaJadwal({ schedule, activePeriod }: JadwalPagePr
                       <Calendar className="h-5 w-5" />
                       {day}
                     </CardTitle>
-                    <CardDescription>{sortedSchedule.length} kelas</CardDescription>
+                    <CardDescription>{sortedSchedule.length} classes</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -67,11 +67,11 @@ export default function MahasiswaJadwal({ schedule, activePeriod }: JadwalPagePr
                           <div className="flex flex-col items-center justify-center min-w-[80px] p-3 bg-primary/10 rounded-lg">
                             <Clock className="h-4 w-4 text-primary mb-1" />
                             <p className="text-sm">
-                              {new Date(detail.kelas!.jam_mulai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                              {new Date(detail.kelas!.jam_mulai).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                             </p>
                             <p className="text-sm">-</p>
                             <p className="text-sm">
-                              {new Date(detail.kelas!.jam_selesai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                              {new Date(detail.kelas!.jam_selesai).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
                           <div className="flex-1 space-y-2">
@@ -89,7 +89,7 @@ export default function MahasiswaJadwal({ schedule, activePeriod }: JadwalPagePr
                                 <span>{detail.kelas?.ruangan?.tempat_ruangan}</span>
                               </div>
                             </div>
-                            <Badge variant="secondary">{detail.kelas?.matakuliah?.sks} SKS</Badge>
+                            <Badge variant="secondary">{detail.kelas?.matakuliah?.sks} credits</Badge>
                           </div>
                         </div>
                       ))}
@@ -104,7 +104,7 @@ export default function MahasiswaJadwal({ schedule, activePeriod }: JadwalPagePr
             <CardContent className="py-12 text-center">
               <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">
-                Belum ada jadwal kuliah. Silakan isi dan ajukan KRS terlebih dahulu.
+                No classes scheduled yet. Please fill out and submit your KRS first.
               </p>
             </CardContent>
           </Card>

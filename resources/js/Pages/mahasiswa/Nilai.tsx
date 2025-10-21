@@ -45,13 +45,13 @@ export default function MahasiswaNilai({ grades, ipk, ips, availableSemesters, s
       <div className="space-y-6">
         <div className="flex justify-between items-start">
           <div>
-            <h2>Nilai Akademik</h2>
-            <p className="text-muted-foreground">Lihat nilai dan indeks prestasi Anda</p>
+            <h2>Academic Grade</h2>
+            <p className="text-muted-foreground">View your grades and performance index</p>
           </div>
           <Select value={selectedSemester} onValueChange={handleSemesterChange}>
             <SelectTrigger className="w-[200px] border-gray-300"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Semester</SelectItem>
+              <SelectItem value="all">All Semesters</SelectItem>
               {availableSemesters.map(semester => (
                   <SelectItem key={semester} value={String(semester)}>Semester {semester}</SelectItem>
               ))}
@@ -62,24 +62,24 @@ export default function MahasiswaNilai({ grades, ipk, ips, availableSemesters, s
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm">IPK (Indeks Prestasi Kumulatif)</CardTitle>
+              <CardTitle className="text-sm">GPA (Cumulative Grade Point Average)</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl">{ipk.toFixed(2)}</div>
-              <p className="text-xs text-muted-foreground mt-1">Dari skala 4.00</p>
+              <p className="text-xs text-muted-foreground mt-1">On a scale of 4.00</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm">IPS (Indeks Prestasi Semester)</CardTitle>
+              <CardTitle className="text-sm">SAI (Semester Achievement Index)</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl">{ips.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {selectedSemester === 'all' ? 'Rata-rata semua semester' : `Semester ${selectedSemester}`}
+                {selectedSemester === 'all' ? 'Average of all semesters' : `Semester ${selectedSemester}`}
               </p>
             </CardContent>
           </Card>
@@ -87,9 +87,9 @@ export default function MahasiswaNilai({ grades, ipk, ips, availableSemesters, s
 
         <Card>
           <CardHeader>
-            <CardTitle>Daftar Nilai</CardTitle>
+            <CardTitle>Score list</CardTitle>
             <CardDescription>
-              {selectedSemester === 'all' ? 'Menampilkan semua semester' : `Menampilkan semester ${selectedSemester}`}
+              {selectedSemester === 'all' ? 'Display All Semesters' : `${selectedSemester} Semester Displayed`}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -98,11 +98,11 @@ export default function MahasiswaNilai({ grades, ipk, ips, availableSemesters, s
                 <TableHeader>
                   <TableRow>
                     <TableHead>Semester</TableHead>
-                    <TableHead>Kode MK</TableHead>
-                    <TableHead>Nama Mata Kuliah</TableHead>
-                    <TableHead>SKS</TableHead>
-                    <TableHead>Nilai Huruf</TableHead>
-                    <TableHead>Nilai Angka</TableHead>
+                    <TableHead>Course Code</TableHead>
+                    <TableHead>Course Name</TableHead>
+                    <TableHead>Credits</TableHead>
+                    <TableHead>Letter Grade</TableHead>
+                    <TableHead>Numerical Grade</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -113,8 +113,8 @@ export default function MahasiswaNilai({ grades, ipk, ips, availableSemesters, s
                         <TableRow>
                           <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
                             {grades.length === 0
-                              ? 'Tidak ada nilai untuk ditampilkan.'
-                              : 'Nilai belum tersedia karena KRS untuk semester ini belum disetujui.'}
+                              ? 'There are no values ​​to display.'
+                              : 'Grades are not yet available because the KRS for this semester has not been approved.'}
                           </TableCell>
                         </TableRow>
                       );
@@ -137,7 +137,7 @@ export default function MahasiswaNilai({ grades, ipk, ips, availableSemesters, s
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Keterangan Nilai</CardTitle>
+            <CardTitle>Grade Criteria</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">

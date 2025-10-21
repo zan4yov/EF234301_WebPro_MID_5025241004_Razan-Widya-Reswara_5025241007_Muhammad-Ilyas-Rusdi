@@ -46,16 +46,16 @@ export function Layout({ children }: LayoutProps) {
     if (user?.role === 'mahasiswa') {
       return [
         { href: '/mahasiswa/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { href: '/mahasiswa/krs', label: 'Kartu Rencana Studi', icon: FileText },
-        { href: '/mahasiswa/jadwal', label: 'Jadwal Kuliah', icon: Calendar },
-        { href: '/mahasiswa/nilai', label: 'Nilai', icon: BookOpen },
+        { href: '/mahasiswa/krs', label: 'Study Plan Card', icon: FileText },
+        { href: '/mahasiswa/jadwal', label: 'Course Schedule', icon: Calendar },
+        { href: '/mahasiswa/nilai', label: 'Grade', icon: BookOpen },
       ];
     } else if (user?.role === 'dosen') {
       return [
         { href: '/dosen/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { href: '/dosen/persetujuan', label: 'Persetujuan KRS', icon: CheckSquare },
-        { href: '/dosen/kelas', label: 'Kelas Saya', icon: Users },
-        { href: '/dosen/jadwal', label: 'Jadwal Mengajar', icon: Calendar },
+        { href: '/dosen/persetujuan', label: 'KRS Approval', icon: CheckSquare },
+        { href: '/dosen/kelas', label: 'My Course', icon: Users },
+        { href: '/dosen/jadwal', label: 'Lecture Schedule', icon: Calendar },
       ];
     }
     return [];
@@ -74,7 +74,7 @@ export function Layout({ children }: LayoutProps) {
               <GraduationCap className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl">Sistem KRS Online</h1>
+              <h1 className="text-xl">Online KRS System</h1>
               <p className="text-xs text-muted-foreground">Institut Teknologi Sepuluh Nopember</p>
             </div>
           </div>
@@ -146,7 +146,7 @@ export function Layout({ children }: LayoutProps) {
 
       <footer className="border-t bg-card mt-12">
         <div className="container mx-auto px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>© 2025 Institut Teknologi Sepuluh Nopember - Sistem KRS Online</p>
+          <p>© 2025 Institut Teknologi Sepuluh Nopember - Online KRS System</p>
         </div>
       </footer>
     </div>

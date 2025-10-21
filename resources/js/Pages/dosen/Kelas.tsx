@@ -15,52 +15,52 @@ interface DosenKelasProps extends PageProps {
 }
 
 export default function DosenKelas({ classes, stats, activePeriod }: DosenKelasProps) {
-  const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   return (
     <>
-      <Head title="Kelas Diampu" />
+      <Head title="Taught Classes" />
       <div className="space-y-6">
         <div>
-          <h2>Kelas yang Diampu</h2>
+          <h2>Classes You Teach</h2>
           {activePeriod ? (
             <p className="text-muted-foreground">
-              Daftar kelas yang Anda ajar untuk periode {activePeriod.tahun}/{activePeriod.tahun + 1} - Semester {activePeriod.semester === 1 ? 'Ganjil' : 'Genap'}
+              List of classes you teach for academic year {activePeriod.tahun}/{activePeriod.tahun + 1} — {activePeriod.semester === 1 ? 'Odd Semester' : 'Even Semester'}
             </p>
           ) : (
-            <p className="text-muted-foreground">Tidak ada periode akademik yang aktif.</p>
+            <p className="text-muted-foreground">No active academic period.</p>
           )}
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm">Total Kelas</CardTitle>
+              <CardTitle className="text-sm">Total Classes</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl">{stats.totalClasses}</div>
-              <p className="text-xs text-muted-foreground">Kelas aktif</p>
+              <p className="text-xs text-muted-foreground">Active classes</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm">Total Mahasiswa</CardTitle>
+              <CardTitle className="text-sm">Total Students</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl">{stats.totalStudents}</div>
-              <p className="text-xs text-muted-foreground">Mahasiswa terdaftar</p>
+              <p className="text-xs text-muted-foreground">Enrolled students</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm">Rata-rata Kapasitas</CardTitle>
+              <CardTitle className="text-sm">Average Capacity</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl">{stats.avgCapacity}%</div>
-              <p className="text-xs text-muted-foreground">Terisi dari kapasitas</p>
+              <p className="text-xs text-muted-foreground">Filled of total capacity</p>
             </CardContent>
           </Card>
         </div>
@@ -79,8 +79,8 @@ export default function DosenKelas({ classes, stats, activePeriod }: DosenKelasP
                       <CardDescription>{kelas.matakuliah?.kode_mk} • {kelas.nama_kelas}</CardDescription>
                     </div>
                     <div className="flex gap-2">
-                      <Badge variant="secondary">{kelas.matakuliah?.sks} SKS</Badge>
-                      <Badge variant="outline">{kelas.terisi}/{kelas.kapasitas} Mahasiswa</Badge>
+                      <Badge variant="secondary">{kelas.matakuliah?.sks} credits</Badge>
+                      <Badge variant="outline">{kelas.terisi}/{kelas.kapasitas} students</Badge>
                     </div>
                   </div>
                 </CardHeader>
@@ -89,18 +89,19 @@ export default function DosenKelas({ classes, stats, activePeriod }: DosenKelasP
                     <div className="flex items-start gap-3">
                       <div className="p-2 bg-primary/10 rounded-lg"><Clock className="h-4 w-4 text-primary" /></div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Jadwal</p>
+                        <p className="text-sm text-muted-foreground">Schedule</p>
                         <p className="text-sm">{dayNames[dayIndex]}</p>
                         <p className="text-sm">
-                          {new Date(kelas.jam_mulai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
-                          - {new Date(kelas.jam_selesai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                          {new Date(kelas.jam_mulai).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                          {' '}–{' '}
+                          {new Date(kelas.jam_selesai).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
                       <div className="p-2 bg-primary/10 rounded-lg"><MapPin className="h-4 w-4 text-primary" /></div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Ruangan</p>
+                        <p className="text-sm text-muted-foreground">Room</p>
                         <p className="text-sm">{kelas.ruangan?.id_ruangan}</p>
                         <p className="text-sm">{kelas.ruangan?.tempat_ruangan}</p>
                       </div>
@@ -108,11 +109,11 @@ export default function DosenKelas({ classes, stats, activePeriod }: DosenKelasP
                     <div className="flex items-start gap-3">
                       <div className="p-2 bg-primary/10 rounded-lg"><Users className="h-4 w-4 text-primary" /></div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Kapasitas ({capacityPercentage.toFixed(0)}%)</p>
+                        <p className="text-sm text-muted-foreground">Capacity ({capacityPercentage.toFixed(0)}%)</p>
                         <div className="w-full bg-muted rounded-full h-2 my-1.5 overflow-hidden">
                           <div className="h-full bg-primary" style={{ width: `${capacityPercentage}%` }} />
                         </div>
-                        <p className="text-sm">{kelas.terisi} dari {kelas.kapasitas}</p>
+                        <p className="text-sm">{kelas.terisi} of {kelas.kapasitas}</p>
                       </div>
                     </div>
                   </div>
@@ -133,7 +134,7 @@ export default function DosenKelas({ classes, stats, activePeriod }: DosenKelasP
             <Card>
               <CardContent className="py-12 text-center">
                 <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">Tidak ada kelas yang diampu pada semester ini.</p>
+                <p className="text-muted-foreground">No classes assigned this semester</p>
               </CardContent>
             </Card>
           )}

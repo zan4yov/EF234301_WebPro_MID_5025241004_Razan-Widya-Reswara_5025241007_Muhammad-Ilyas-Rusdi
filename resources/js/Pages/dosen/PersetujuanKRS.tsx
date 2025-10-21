@@ -64,14 +64,14 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
   const handleSaveGrade = (detailId: string) => {
     const nilai_huruf = gradeEdits[detailId];
     if (!nilai_huruf) {
-      toast.error('Pilih nilai terlebih dahulu.');
+      toast.error('Please select a grade first.');
       return;
     }
     setSavingIds(prev => new Set(prev).add(detailId));
     router.patch(route('dosen.persetujuan.updateNilai', detailId), { nilai_huruf }, {
       preserveScroll: true,
       onSuccess: () => {
-        toast.success('Nilai disimpan');
+        toast.success('Grade saved');
         setSelectedKRS(prev => {
           if (!prev) return prev;
           return {
@@ -80,7 +80,7 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
           };
         });
       },
-      onError: () => toast.error('Gagal menyimpan nilai'),
+      onError: () => toast.error('Failed to save grade'),
       onFinish: () => setSavingIds(prev => {
         const next = new Set(prev);
         next.delete(detailId);
@@ -95,11 +95,11 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
     router.patch(route('dosen.persetujuan.approve', selectedKRS.id_krs), {}, {
       preserveScroll: true,
       onSuccess: () => {
-        toast.success('KRS disetujui.');
+        toast.success('KRS approved.');
         resetDialog();
       },
-  onError: (_errors) => {
-        toast.error('Gagal menyetujui KRS');
+      onError: (_errors) => {
+        toast.error('Failed to approve KRS');
       },
       onFinish: () => setApproving(false),
     });
@@ -108,18 +108,18 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
   const handleReject = () => {
     if (!selectedKRS || rejecting) return;
     if (!catatan.trim()) {
-      toast.error('Catatan penolakan wajib diisi.');
+      toast.error('Rejection notes are required.');
       return;
     }
     setRejecting(true);
     router.patch(route('dosen.persetujuan.reject', selectedKRS.id_krs), { catatan }, {
       preserveScroll: true,
       onSuccess: () => {
-        toast.success('KRS ditolak.');
+        toast.success('KRS rejected.');
         resetDialog();
       },
       onError: (errors: any) => {
-        toast.error(errors?.catatan || 'Gagal menolak KRS');
+        toast.error(errors?.catatan || 'Failed to reject KRS');
       },
       onFinish: () => setRejecting(false),
     });
@@ -135,13 +135,13 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
     } else if (status === 1) {
       return (
         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-          <CheckCircle2 className="w-3 h-3 mr-1" /> Disetujui
+          <CheckCircle2 className="w-3 h-3 mr-1" /> Approved
         </Badge>
       );
     } else {
       return (
         <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-          <XCircle className="w-3 h-3 mr-1" /> Ditolak
+          <XCircle className="w-3 h-3 mr-1" /> Rejected
         </Badge>
       );
     }
@@ -151,20 +151,22 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
     <div className="rounded-md border">
       <Table>
         <TableHeader>
-                  <TableRow>
-            <TableHead>Mahasiswa</TableHead>
+          <TableRow>
+            <TableHead>Student</TableHead>
             <TableHead>NRP</TableHead>
             <TableHead>Semester</TableHead>
-            <TableHead>Total SKS</TableHead>
-            <TableHead>Mata Kuliah</TableHead>
-            <TableHead>Tanggal Pengajuan</TableHead>
+            <TableHead>Total Credits</TableHead>
+            <TableHead>Courses</TableHead>
+            <TableHead>Submission Date</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Aksi</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
-            <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Tidak ada data</TableCell></TableRow>
+            <TableRow>
+              <TableCell colSpan={8} className="text-center text-muted-foreground py-8">No data</TableCell>
+            </TableRow>
           ) : (
             data.map((krs) => (
               <TableRow key={krs.id_krs}>
@@ -173,11 +175,13 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
                 <TableCell>{krs.mahasiswa?.semester}</TableCell>
                 <TableCell>{krs.total_sks}</TableCell>
                 <TableCell>{krs.detail_krs?.length}</TableCell>
-                <TableCell>{new Date(krs.tanggal_pengajuan).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</TableCell>
+                <TableCell>
+                  {new Date(krs.tanggal_pengajuan).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </TableCell>
                 <TableCell>{getStatusBadge(krs.status_persetujuan)}</TableCell>
                 <TableCell>
                   <Button size="sm" variant="outline" onClick={() => setSelectedKRS(krs)}>
-                    <Eye className="h-4 w-4 mr-1" /> Detail
+                    <Eye className="h-4 w-4 mr-1" /> Details
                   </Button>
                 </TableCell>
               </TableRow>
@@ -190,24 +194,33 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
 
   return (
     <>
-      <Head title="Persetujuan KRS" />
+      <Head title="KRS Approval" />
       <div className="space-y-6">
         <div>
-          <h2>Persetujuan KRS</h2>
-          <p className="text-muted-foreground">Tinjau dan setujui KRS mahasiswa bimbingan Anda</p>
+          <h2>KRS Approval</h2>
+          <p className="text-muted-foreground">Review and approve your advisees’ KRS</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm">Menunggu Persetujuan</CardTitle><Clock className="h-4 w-4 text-muted-foreground" /></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm">Pending Approval</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
             <CardContent><div className="text-2xl">{stats.pending}</div></CardContent>
           </Card>
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm">Disetujui</CardTitle><CheckCircle2 className="h-4 w-4 text-muted-foreground" /></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm">Approved</CardTitle>
+              <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
             <CardContent><div className="text-2xl">{stats.approved}</div></CardContent>
           </Card>
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm">Ditolak</CardTitle><XCircle className="h-4 w-4 text-muted-foreground" /></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm">Rejected</CardTitle>
+              <XCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
             <CardContent><div className="text-2xl">{stats.rejected}</div></CardContent>
           </Card>
         </div>
@@ -215,36 +228,64 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
         <Tabs defaultValue="pending" className="space-y-4">
           <TabsList>
             <TabsTrigger value="pending">Pending ({stats.pending})</TabsTrigger>
-            <TabsTrigger value="approved">Disetujui ({stats.approved})</TabsTrigger>
-            <TabsTrigger value="rejected">Ditolak ({stats.rejected})</TabsTrigger>
+            <TabsTrigger value="approved">Approved ({stats.approved})</TabsTrigger>
+            <TabsTrigger value="rejected">Rejected ({stats.rejected})</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="pending"><Card><CardHeader><CardTitle>KRS Menunggu Persetujuan</CardTitle><CardDescription>Tinjau dan berikan persetujuan untuk KRS mahasiswa</CardDescription></CardHeader><CardContent><KRSTable data={pendingKRS} /></CardContent></Card></TabsContent>
-          <TabsContent value="approved"><Card><CardHeader><CardTitle>KRS Disetujui</CardTitle><CardDescription>Tinjau dan berikan persetujuan untuk KRS mahasiswa</CardDescription></CardHeader><CardContent><KRSTable data={approvedKRS} /></CardContent></Card></TabsContent>
-          <TabsContent value="rejected"><Card><CardHeader><CardTitle>KRS Ditolak</CardTitle><CardDescription>Tinjau dan berikan persetujuan untuk KRS mahasiswa</CardDescription></CardHeader><CardContent><KRSTable data={rejectedKRS} /></CardContent></Card></TabsContent>
+          <TabsContent value="pending">
+            <Card>
+              <CardHeader>
+                <CardTitle>KRS Pending Approval</CardTitle>
+                <CardDescription>Review and approve students’ KRS</CardDescription>
+              </CardHeader>
+              <CardContent><KRSTable data={pendingKRS} /></CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="approved">
+            <Card>
+              <CardHeader>
+                <CardTitle>Approved KRS</CardTitle>
+                <CardDescription>Previously approved students’ KRS</CardDescription>
+              </CardHeader>
+              <CardContent><KRSTable data={approvedKRS} /></CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="rejected">
+            <Card>
+              <CardHeader>
+                <CardTitle>Rejected KRS</CardTitle>
+                <CardDescription>Previously rejected students’ KRS</CardDescription>
+              </CardHeader>
+              <CardContent><KRSTable data={rejectedKRS} /></CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
 
       <Dialog open={!!selectedKRS} onOpenChange={(open) => { if (!open) resetDialog(); }}>
         <DialogContent className="w-full max-w-6xl lg:max-w-7xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Detail KRS - {selectedKRS?.mahasiswa?.nama}</DialogTitle>
-            <DialogDescription>NRP: {selectedKRS?.mahasiswa?.nrp} • Semester {selectedKRS?.mahasiswa?.semester}</DialogDescription>
+            <DialogTitle>KRS Details — {selectedKRS?.mahasiswa?.nama}</DialogTitle>
+            <DialogDescription>
+              NRP: {selectedKRS?.mahasiswa?.nrp} • Semester {selectedKRS?.mahasiswa?.semester}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
               <div>
-                <p className="text-sm text-muted-foreground">Total SKS</p>
-                <p>{selectedKRS?.total_sks} SKS</p>
+                <p className="text-sm text-muted-foreground">Total Credits</p>
+                <p>{selectedKRS?.total_sks} credits</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total Mata Kuliah</p>
-                <p>{selectedKRS?.detail_krs?.length} Mata Kuliah</p>
+                <p className="text-sm text-muted-foreground">Total Courses</p>
+                <p>{selectedKRS?.detail_krs?.length} courses</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Tanggal Pengajuan</p>
+                <p className="text-sm text-muted-foreground">Submission Date</p>
                 <p>
-                  {selectedKRS && new Date(selectedKRS.tanggal_pengajuan).toLocaleDateString('id-ID', {
+                  {selectedKRS && new Date(selectedKRS.tanggal_pengajuan).toLocaleDateString('en-US', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',
@@ -260,13 +301,13 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Kode MK</TableHead>
-                    <TableHead>Nama Mata Kuliah</TableHead>
-                    <TableHead>SKS</TableHead>
-                    <TableHead>Kelas</TableHead>
-                    <TableHead>Dosen</TableHead>
-                    <TableHead>Jadwal</TableHead>
-                    <TableHead>Nilai</TableHead>
+                    <TableHead>Course Code</TableHead>
+                    <TableHead>Course Name</TableHead>
+                    <TableHead>Credits</TableHead>
+                    <TableHead>Class</TableHead>
+                    <TableHead>Lecturer</TableHead>
+                    <TableHead>Schedule</TableHead>
+                    <TableHead>Grade</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -284,8 +325,8 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
                         <TableCell className="text-xs">
                           {detail.kelas?.jam_mulai && (
                             <>
-                              {new Date(detail.kelas.jam_mulai).toLocaleDateString('id-ID', { weekday: 'short' })},{' '}
-                              {new Date(detail.kelas.jam_mulai).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                              {new Date(detail.kelas.jam_mulai).toLocaleDateString('en-US', { weekday: 'short' })},{' '}
+                              {new Date(detail.kelas.jam_mulai).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                             </>
                           )}
                         </TableCell>
@@ -309,7 +350,7 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
                                 <option value="E">E</option>
                               </select>
                               <Button size="sm" variant="outline" onClick={() => handleSaveGrade(key)} disabled={!currentGrade || saving}>
-                                <Save className="h-3 w-3 mr-1" /> Simpan
+                                <Save className="h-3 w-3 mr-1" /> Save
                               </Button>
                             </div>
                           )}
@@ -324,17 +365,17 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
               <div className="rounded-md border p-3 bg-blue-50/30 border-blue-200">
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Waitlist</Badge>
-                  <span className="text-sm text-blue-800">Mahasiswa ini juga mengantri pada kelas berikut (belum terdaftar resmi).</span>
+                  <span className="text-sm text-blue-800">This student is queued for the following classes (not officially enrolled yet).</span>
                 </div>
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Kode MK</TableHead>
-                        <TableHead>Nama MK</TableHead>
-                        <TableHead>SKS</TableHead>
-                        <TableHead>Kelas</TableHead>
-                        <TableHead>Dosen</TableHead>
+                        <TableHead>Course Code</TableHead>
+                        <TableHead>Course Name</TableHead>
+                        <TableHead>Credits</TableHead>
+                        <TableHead>Class</TableHead>
+                        <TableHead>Lecturer</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -355,38 +396,39 @@ export default function DosenPersetujuanKRS({ allKrs, stats, flash }: Persetujua
           </div>
           {selectedKRS?.status_persetujuan === 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">Catatan (wajib untuk penolakan)</label>
+              <label className="text-sm font-medium">Notes (required for rejection)</label>
               <textarea
                 className="w-full rounded-md border bg-background p-2 text-sm"
                 rows={3}
                 value={catatan}
                 onChange={(e) => setCatatan(e.target.value)}
-                placeholder="Tambahkan catatan penolakan atau alasan (maks 255 karakter)"/>
-              <p className="text-xs text-muted-foreground">Kosongkan jika akan menyetujui.</p>
+                placeholder="Add rejection notes or reasons (max 255 characters)"
+              />
+              <p className="text-xs text-muted-foreground">Leave blank if approving.</p>
             </div>
           )}
           <DialogFooter>
             {selectedKRS?.status_persetujuan === 0 && (
               <>
-                <Button variant="outline" onClick={resetDialog}>Tutup</Button>
+                <Button variant="outline" onClick={resetDialog}>Close</Button>
                 <Button variant="destructive" onClick={handleReject} disabled={rejecting}>
-                  <XCircle className="mr-2 h-4 w-4" /> Tolak
+                  <XCircle className="mr-2 h-4 w-4" /> Reject
                 </Button>
                 <Button onClick={handleApprove} disabled={approving}>
-                  <CheckCircle2 className="mr-2 h-4 w-4" /> Setujui
+                  <CheckCircle2 className="mr-2 h-4 w-4" /> Approve
                 </Button>
               </>
             )}
             {selectedKRS?.status_persetujuan === 2 && (
               <>
-                <Button onClick={resetDialog}>Tutup</Button>
+                <Button onClick={resetDialog}>Close</Button>
                 <Button variant="outline" onClick={handleApprove} disabled={approving}>
-                  <CheckCircle2 className="mr-2 h-4 w-4" /> Setujui
+                  <CheckCircle2 className="mr-2 h-4 w-4" /> Approve
                 </Button>
               </>
             )}
             {selectedKRS?.status_persetujuan === 1 && (
-              <Button onClick={resetDialog}>Tutup</Button>
+              <Button onClick={resetDialog}>Close</Button>
             )}
           </DialogFooter>
         </DialogContent>

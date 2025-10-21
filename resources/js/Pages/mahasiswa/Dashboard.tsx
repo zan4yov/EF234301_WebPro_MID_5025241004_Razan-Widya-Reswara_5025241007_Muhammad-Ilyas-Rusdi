@@ -20,7 +20,7 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
       return (
         <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
           <Clock className="w-3 h-3 mr-1" />
-          Menunggu Persetujuan
+          Pending Approval
         </Badge>
       );
     }
@@ -28,14 +28,14 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
       return (
         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
           <CheckCircle2 className="w-3 h-3 mr-1" />
-          Disetujui
+          Approved
         </Badge>
       );
     }
     return (
       <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
         <XCircle className="w-3 h-3 mr-1" />
-        Ditolak
+        Rejected
       </Badge>
     );
   };
@@ -43,60 +43,60 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
   const maxSKS = 24;
   const currentSKS = currentKrs?.total_sks || 0;
   const sksProgress = (currentSKS / maxSKS) * 100;
-  const today = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
     <>
       <Head title="Dashboard" />
       <div className="space-y-6">
         <div>
-          <h2>Selamat Datang, {mahasiswa.nama}!</h2>
+          <h2>Welcome, {mahasiswa.nama}!</h2>
           <p className="text-muted-foreground">
-            {mahasiswa.program_studi?.nama_prodi} - Semester {mahasiswa.semester}
+            {mahasiswa.program_studi?.nama_prodi} — Semester {mahasiswa.semester}
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm">Semester Aktif</CardTitle>
+              <CardTitle className="text-sm">Active Semester</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl">{mahasiswa.semester}</div>
-              <p className="text-xs text-muted-foreground">Angkatan {mahasiswa.angkatan}</p>
+              <p className="text-xs text-muted-foreground">Cohort {mahasiswa.angkatan}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm">Total SKS Diambil</CardTitle>
+              <CardTitle className="text-sm">Total Credits Taken</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl">{currentSKS}</div>
-              <p className="text-xs text-muted-foreground">dari maksimal {maxSKS} SKS</p>
+              <p className="text-xs text-muted-foreground">of a maximum {maxSKS} credits</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm">Mata Kuliah</CardTitle>
+              <CardTitle className="text-sm">Courses</CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl">{currentKrs?.detail_krs?.length || 0}</div>
-              <p className="text-xs text-muted-foreground">Mata kuliah diambil</p>
+              <p className="text-xs text-muted-foreground">Courses taken</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm">Status KRS</CardTitle>
+              <CardTitle className="text-sm">KRS Status</CardTitle>
               <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent className="pt-2">
               {currentKrs ? getStatusBadge(currentKrs.status_persetujuan) : (
                 <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
                   <Clock className="w-3 h-3 mr-1" />
-                  Belum Diisi
+                  Not Filled
                 </Badge>
               )}
             </CardContent>
@@ -105,21 +105,21 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
 
         <Card>
           <CardHeader>
-            <CardTitle>Progress Pengisian KRS</CardTitle>
+            <CardTitle>KRS Submission Progress</CardTitle>
             {activePeriod ? (
               <CardDescription>
-                Periode: {activePeriod.tahun}/{activePeriod.tahun + 1} - Semester {activePeriod.semester === 1 ? 'Ganjil' : 'Genap'}
+                Period: {activePeriod.tahun}/{activePeriod.tahun + 1} — {activePeriod.semester === 1 ? 'Odd Semester' : 'Even Semester'}
               </CardDescription>
             ) : (
-              <CardDescription>Tidak ada periode KRS yang aktif.</CardDescription>
+              <CardDescription>No active KRS period.</CardDescription>
             )}
           </CardHeader>
           {currentKrs ? (
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>SKS yang diambil</span>
-                  <span>{currentSKS} / {maxSKS} SKS</span>
+                  <span>Credits taken</span>
+                  <span>{currentSKS} / {maxSKS} credits</span>
                 </div>
                 <Progress value={sksProgress} />
               </div>
@@ -127,11 +127,11 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
                 <Button asChild>
                   <Link href="/mahasiswa/krs">
                     <FileText className="mr-2 h-4 w-4" />
-                    Lihat KRS
+                    View KRS
                   </Link>
                 </Button>
                 {currentKrs.status_persetujuan === 0 && (
-                  <Button variant="outline">
+                  <Button variant="outline" asChild>
                     <Link href="/mahasiswa/krs">Edit KRS</Link>
                   </Button>
                 )}
@@ -142,13 +142,13 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
               {currentKrs ? (
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm">
-                    <span>SKS yang diambil</span>
-                    <span>{currentSKS} / {maxSKS} SKS</span>
+                    <span>Credits taken</span>
+                    <span>{currentSKS} / {maxSKS} credits</span>
                   </div>
                   <Progress value={sksProgress} />
                   <div className="flex gap-2">
                     <Button asChild>
-                      <Link href="/mahasiswa/krs"><FileText className="mr-2 h-4 w-4" />Lihat KRS</Link>
+                      <Link href="/mahasiswa/krs"><FileText className="mr-2 h-4 w-4" />View KRS</Link>
                     </Button>
                   </div>
                 </div>
@@ -156,39 +156,40 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 text-sm text-muted-foreground">
                     <Info className="h-4 w-4" />
-                    <p>Anda belum mengisi KRS untuk periode ini.</p>
+                    <p>You haven’t filled out KRS for this period.</p>
                   </div>
                   <div className="flex gap-2">
-                      <Button asChild>
-                        <Link href="/mahasiswa/krs"><FileText className="mr-2 h-4 w-4" />Isi KRS</Link>
-                      </Button>
+                    <Button asChild>
+                      <Link href="/mahasiswa/krs"><FileText className="mr-2 h-4 w-4" />Fill KRS</Link>
+                    </Button>
                   </div>
                 </div>
               )}
             </CardContent>
           )}
         </Card>
+
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Informasi Akademik</CardTitle>
+              <CardTitle>Academic Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm">NRP</p>
+                  <p className="text-sm">Student ID</p>
                   <p className="text-muted-foreground">{mahasiswa.nrp ? mahasiswa.nrp : "-"}</p>
                 </div>
               </div>
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm">Program Studi</p>
+                  <p className="text-sm">Study Program</p>
                   <p className="text-muted-foreground">{mahasiswa.program_studi ? mahasiswa.program_studi?.nama_prodi : "-"}</p>
                 </div>
               </div>
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm">Dosen Pembimbing</p>
+                  <p className="text-sm">Academic Advisor</p>
                   <p className="text-muted-foreground">{ mahasiswa.dosen_pembimbing ? mahasiswa.dosen_pembimbing?.nama_dosen : "-"}</p>
                 </div>
               </div>
@@ -204,14 +205,14 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
                       {mahasiswa.status_mahasiswa}
                     </Badge>
                   )}
-
                 </div>
               </div>
             </CardContent>
           </Card>
+
           <Card>
             <CardHeader>
-              <CardTitle>Jadwal Hari Ini</CardTitle>
+              <CardTitle>Today’s Schedule</CardTitle>
               <CardDescription>{today}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -229,15 +230,15 @@ export default function MahasiswaDashboard({ mahasiswa, currentKrs, activePeriod
                       </p>
                     </div>
                     <Badge variant="outline">
-                      {new Date(kelas.jam_mulai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} - {new Date(kelas.jam_selesai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                      {new Date(kelas.jam_mulai!).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} - {new Date(kelas.jam_selesai!).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                     </Badge>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground">Tidak ada jadwal hari ini.</p>
+                <p className="text-sm text-muted-foreground">No schedule today.</p>
               )}
               <Button variant="outline" className="w-full" asChild>
-                <Link href="/mahasiswa/jadwal">Lihat Jadwal Lengkap</Link>
+                <Link href="/mahasiswa/jadwal">View Full Schedule</Link>
               </Button>
             </CardContent>
           </Card>

@@ -30,19 +30,19 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
     if (status === 0) {
       return (
         <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-          Menunggu Persetujuan
+          Pending Approval
         </Badge>
       );
     } else if (status === 1) {
       return (
         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-          Disetujui
+          Approved
         </Badge>
       );
     } else {
       return (
         <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-          Ditolak
+          Rejected
         </Badge>
       );
     }
@@ -54,9 +54,9 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
   }, 0);
 
   const getJenisMK = (jenis?: number) => {
-    if (jenis === 1) return 'Wajib';
-    if (jenis === 2) return 'Pilihan';
-    return 'Lainnya';
+    if (jenis === 1) return 'Required';
+    if (jenis === 2) return 'Elective';
+    return 'Other';
   };
 
   const isKelasAvailable = (kelas: Kelas) => {
@@ -85,10 +85,10 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
     post('/mahasiswa/krs', {
       preserveScroll: true,
       onSuccess: () => {
-        toast.success('KRS berhasil diajukan!');
+        toast.success('KRS submitted successfully!');
         setActiveTab('current');
       },
-      onError: () => toast.error('Terjadi kesalahan saat mengajukan KRS.'),
+      onError: () => toast.error('An error occurred while submitting KRS.'),
     });
   };
 
@@ -103,7 +103,7 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
         return total + (kelas?.matakuliah?.sks || 0);
       }, 0);
       if (newTotalSks > 24) {
-        toast.error('Batas SKS terlampaui', { description: 'Total SKS tidak boleh melebihi 24.' });
+        toast.error('Credit limit exceeded', { description: 'Total credits may not exceed 24.' });
         return;
       }
       newIds = [...currentIds, kelasId];
@@ -116,10 +116,10 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
   
   const getStatusInfo = (status: number | undefined) => {
     switch (status) {
-      case 0: return { Icon: Clock, text: "Menunggu Persetujuan", className: "bg-yellow-50 text-yellow-700 border-yellow-200" };
-      case 1: return { Icon: CheckCircle2, text: "Disetujui", className: "bg-green-50 text-green-700 border-green-200" };
-      case 2: return { Icon: XCircle, text: "Ditolak", className: "bg-red-50 text-red-700 border-red-200" };
-      default: return { Icon: Info, text: "Belum Diajukan", className: "bg-red-50 text-red-700 border-red-200" };
+      case 0: return { Icon: Clock, text: 'Pending Approval', className: 'bg-yellow-50 text-yellow-700 border-yellow-200' };
+      case 1: return { Icon: CheckCircle2, text: 'Approved', className: 'bg-green-50 text-green-700 border-green-200' };
+      case 2: return { Icon: XCircle, text: 'Rejected', className: 'bg-red-50 text-red-700 border-red-200' };
+      default: return { Icon: Info, text: 'Not Submitted', className: 'bg-red-50 text-red-700 border-red-200' };
     }
   };
   
@@ -127,14 +127,14 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
   
   return (
     <>
-      <Head title="Kartu Rencana Studi" />
+      <Head title="Study Plan (KRS)" />
       <div className="space-y-6">
         <div className="flex justify-between items-start">
           <div>
-            <h2>Kartu Rencana Studi (KRS)</h2>
+            <h2>Study Plan (KRS)</h2>
             {activePeriod && (
               <p className="text-muted-foreground">
-                Periode {activePeriod.tahun}/{activePeriod.tahun + 1} - Semester {activePeriod.semester === 1 ? 'Ganjil' : 'Genap'}
+                Academic Year {activePeriod.tahun}/{activePeriod.tahun + 1} — {activePeriod.semester === 1 ? 'Odd Semester' : 'Even Semester'}
               </p>
             )}
           </div>
@@ -147,8 +147,8 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'current' | 'add')} className="space-y-4">
           <TabsList>
-            <TabsTrigger value="current">KRS Saat Ini</TabsTrigger>
-            <TabsTrigger value="add">Tambah Mata Kuliah</TabsTrigger>
+            <TabsTrigger value="current">Current KRS</TabsTrigger>
+            <TabsTrigger value="add">Add Courses</TabsTrigger>
           </TabsList>
 
           <TabsContent value="current" className="space-y-4">
@@ -157,15 +157,15 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle>
-                      {currentKrs ? `KRS Semester ${currentKrs.semester}` : 'KRS Saat Ini'}
+                      {currentKrs ? `Semester ${currentKrs.semester} KRS` : 'Current KRS'}
                     </CardTitle>
                     <CardDescription>
                       {currentKrs && (
-                        <>Diajukan pada {new Date(currentKrs.tanggal_pengajuan).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}</>
+                        <>Submitted on {new Date(currentKrs.tanggal_pengajuan).toLocaleDateString('en-US', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}</>
                       )}
                     </CardDescription>
                   </div>
@@ -177,9 +177,9 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                   <Info className="h-4 w-4" />
                   <AlertDescription>
                     {currentKrs ? (
-                      <>Total SKS yang diambil: <strong>{getTotalSKS()} SKS</strong> dari maksimal 24 SKS</>
+                      <>Total credits taken: <strong>{getTotalSKS()} credits</strong> of a maximum 24</>
                     ) : (
-                      'Belum ada KRS diajukan.'
+                      'No KRS has been submitted yet.'
                     )}
                   </AlertDescription>
                 </Alert>
@@ -188,18 +188,18 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                   <div className="rounded-md border p-4 bg-blue-50/30 border-blue-200">
                     <div className="flex items-center gap-2 mb-2">
                       <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Waitlist</Badge>
-                      <span className="text-sm text-blue-800">Anda saat ini dalam antrean untuk kelas berikut. Kelas ini belum dihitung ke total SKS dan tidak akan muncul di tempat lain hingga mendapat kursi.</span>
+                      <span className="text-sm text-blue-800">You are currently queued for the following classes. These are not counted toward total credits and will not appear elsewhere until a seat is assigned.</span>
                     </div>
                     <div className="rounded-md border">
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Kode MK</TableHead>
-                            <TableHead>Nama Mata Kuliah</TableHead>
-                            <TableHead>SKS</TableHead>
-                            <TableHead>Kelas</TableHead>
-                            <TableHead>Dosen</TableHead>
-                            <TableHead>Antre Sejak</TableHead>
+                            <TableHead>Course Code</TableHead>
+                            <TableHead>Course Name</TableHead>
+                            <TableHead>Credits</TableHead>
+                            <TableHead>Class</TableHead>
+                            <TableHead>Lecturer</TableHead>
+                            <TableHead>Queued Since</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -210,7 +210,7 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                               <TableCell>{w.kelas?.matakuliah?.sks}</TableCell>
                               <TableCell>{w.kelas?.nama_kelas}</TableCell>
                               <TableCell className="text-xs">{w.kelas?.dosen?.nama_dosen}</TableCell>
-                              <TableCell className="text-xs">{new Date(w.created_at).toLocaleString('id-ID')}</TableCell>
+                              <TableCell className="text-xs">{new Date(w.created_at).toLocaleString('en-US')}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -223,13 +223,13 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Kode MK</TableHead>
-                        <TableHead>Nama Mata Kuliah</TableHead>
-                        <TableHead>SKS</TableHead>
-                        <TableHead>Kelas</TableHead>
-                        <TableHead>Dosen</TableHead>
-                        <TableHead>Jadwal</TableHead>
-                        <TableHead>Ruangan</TableHead>
+                        <TableHead>Course Code</TableHead>
+                        <TableHead>Course Name</TableHead>
+                        <TableHead>Credits</TableHead>
+                        <TableHead>Class</TableHead>
+                        <TableHead>Lecturer</TableHead>
+                        <TableHead>Schedule</TableHead>
+                        <TableHead>Room</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -241,9 +241,9 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                           <TableCell>{detail.kelas?.nama_kelas}</TableCell>
                           <TableCell>{detail.kelas?.dosen?.nama_dosen}</TableCell>
                           <TableCell className="text-xs">
-                            {new Date(detail.kelas?.jam_mulai!).toLocaleDateString('id-ID', { weekday: 'short' })},{' '}
-                            {new Date(detail.kelas?.jam_mulai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} -{' '}
-                            {new Date(detail.kelas?.jam_selesai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                            {new Date(detail.kelas?.jam_mulai!).toLocaleDateString('en-US', { weekday: 'short' })},{' '}
+                            {new Date(detail.kelas?.jam_mulai!).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} -{' '}
+                            {new Date(detail.kelas?.jam_selesai!).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
                           </TableCell>
                           <TableCell className="text-xs">{detail.kelas?.ruangan?.id_ruangan}</TableCell>
                         </TableRow>
@@ -256,22 +256,22 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                   <div className="flex gap-2">
                     <Button onClick={handleSubmitKRS} disabled={processing} variant="secondary">
                       <Send className="mr-2 h-4 w-4" />
-                      Ajukan Ulang
+                      Resubmit
                     </Button>
                     <Button
                       variant="destructive"
                       disabled={processing}
                       onClick={() => {
-                        if (confirm('Batalkan pengajuan KRS ini? Tindakan ini akan menghapus seluruh pilihan kelas.')) {
+                        if (confirm('Cancel this KRS submission? This will remove all selected classes.')) {
                           router.delete('/mahasiswa/krs', {
                             preserveScroll: true,
-                            onSuccess: () => toast.success('Pengajuan KRS dibatalkan'),
-                            onError: () => toast.error('Gagal membatalkan pengajuan KRS'),
+                            onSuccess: () => toast.success('KRS submission canceled.'),
+                            onError: () => toast.error('Failed to cancel KRS submission.'),
                           });
                         }
                       }}
                     >
-                      Batalkan Pengajuan
+                      Cancel Submission
                     </Button>
                   </div>
                 )}
@@ -281,14 +281,14 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                     <Alert variant="destructive">
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
-                        KRS Anda ditolak. Silakan edit dan ajukan kembali.
+                        Your KRS was rejected. Please edit and submit again.
                       </AlertDescription>
                     </Alert>
                     <Card>
                       <CardHeader>
                         <div className="flex justify-between items-start">
                           <CardTitle>
-                            Catatan Penolakan
+                            Rejection Notes
                           </CardTitle>
                         </div>
                       </CardHeader>
@@ -303,7 +303,7 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                   <Alert className="bg-green-50 border-green-200">
                     <CheckCircle2 className="h-4 w-4 text-green-600" />
                     <AlertDescription className="text-green-800">
-                      KRS Anda telah disetujui oleh dosen pembimbing.
+                      Your KRS has been approved by the academic advisor.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -314,16 +314,16 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
           <TabsContent value="add" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Tambah Mata Kuliah</CardTitle>
+                <CardTitle>Add Courses</CardTitle>
                 <CardDescription>
-                  Pilih mata kuliah yang ingin Anda ambil semester ini
+                  Select the courses you want to take this semester
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Alert>
                   <Info className="h-4 w-4" />
                   <AlertDescription>
-                    Total SKS saat ini: <strong>{getTotalSKS()} SKS</strong> dari maksimal 24 SKS
+                    Current total: <strong>{getTotalSKS()} credits</strong> of a maximum 24
                   </AlertDescription>
                 </Alert>
 
@@ -331,15 +331,15 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Kode MK</TableHead>
-                        <TableHead>Nama Mata Kuliah</TableHead>
-                        <TableHead>SKS</TableHead>
-                        <TableHead>Jenis</TableHead>
-                        <TableHead>Kelas</TableHead>
-                        <TableHead>Hari</TableHead>
-                        <TableHead>Dosen</TableHead>
-                        <TableHead>Kapasitas</TableHead>
-                        <TableHead>Aksi</TableHead>
+                        <TableHead>Course Code</TableHead>
+                        <TableHead>Course Name</TableHead>
+                        <TableHead>Credits</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Class</TableHead>
+                        <TableHead>Day</TableHead>
+                        <TableHead>Lecturer</TableHead>
+                        <TableHead>Capacity</TableHead>
+                        <TableHead>Action</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -359,9 +359,10 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                             </TableCell>
                             <TableCell>{kelas.nama_kelas}</TableCell>
                             <TableCell className="text-xs">
-                            {new Date(kelas?.jam_mulai!).toLocaleDateString('id-ID', { weekday: 'short' })},{' '}
-                            {new Date(kelas?.jam_mulai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} -{' '}
-                            {new Date(kelas?.jam_selesai!).toLocaleTimeString('id-ID', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}</TableCell>
+                              {new Date(kelas?.jam_mulai!).toLocaleDateString('en-US', { weekday: 'short' })},{' '}
+                              {new Date(kelas?.jam_mulai!).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} -{' '}
+                              {new Date(kelas?.jam_selesai!).toLocaleTimeString('en-US', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                            </TableCell>
                             <TableCell className="text-xs">{kelas.dosen?.nama_dosen}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-2">
@@ -390,14 +391,18 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                                   variant="outline"
                                   onClick={() => handleAddKelas(kelas.id_kelas)}
                                   disabled={courseAlreadyChosen}
-                                  title={courseAlreadyChosen ? 'Mata kuliah ini sudah dipilih di kelas lain' : (!available ? 'Kelas penuh, Anda akan masuk waitlist' : '')}
+                                  title={
+                                    courseAlreadyChosen
+                                      ? 'This course is already selected in another class'
+                                      : (!available ? 'Class is full; you will be placed on the waitlist' : '')
+                                  }
                                 >
                                   {available ? (
                                     <Plus className="h-4 w-4" />
                                   ) : (
                                     <div className="flex items-center gap-1">
                                       <Clock className="h-4 w-4" />
-                                      <span>Antri</span>
+                                      <span>Waitlist</span>
                                     </div>
                                   )}
                                 </Button>
@@ -413,7 +418,7 @@ export default function MahasiswaKRS({ mahasiswa, currentKrs, availableClasses, 
                 <div className="flex gap-2">
                   <Button onClick={handleSubmitKRS} disabled={selectedKelas.length === 0 || processing}>
                     <Send className="mr-2 h-4 w-4" />
-                    Simpan dan Ajukan
+                    Save & Submit
                   </Button>
                   <Button variant="outline" onClick={() => setData('kelas_ids', [])}>
                     Reset
