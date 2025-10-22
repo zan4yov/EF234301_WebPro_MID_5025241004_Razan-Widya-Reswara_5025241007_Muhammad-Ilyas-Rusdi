@@ -1,5 +1,10 @@
 # FRS (Formulir Rencana Studi) Management Application
 
+| Nama | NRP |
+|------|-----|
+| Razan Widya Reswara | 5025241004 |
+| Mochammad Irfan Sandy | 5025241127 |
+
 A Laravel 12 + Inertia.js (React + TypeScript + Vite + Tailwind) application for managing academic Study Plans (FRS), course enrollment, approvals, grades, and student performance metrics (IPS/IPK).
 
 ## Tech Stack
